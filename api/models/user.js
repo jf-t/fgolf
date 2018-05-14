@@ -15,6 +15,13 @@ class User {
             sessionToken: this.sessionToken
         };
     }
+
+    get publicInfo () {
+        return {
+            username: this.username,
+            email: this.email
+        };
+    }
 }
 
 

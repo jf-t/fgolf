@@ -1,14 +1,17 @@
-DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS tournament;
-DROP TABLE IF EXISTS player;
-DROP TABLE IF EXISTS player_tournament_join;
-DROP TABLE IF EXISTS league;
-DROP TABLE IF EXISTS league_user;
-DROP TABLE IF EXISTS league_tournament;
-DROP TABLE IF EXISTS user_tournament_results;
 DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS user_tournament_results;
+DROP TABLE IF EXISTS league_tournament;
+DROP TABLE IF EXISTS league_user;
+DROP TABLE IF EXISTS league;
+DROP TABLE IF EXISTS player_tournament_join;
+DROP TABLE IF EXISTS player;
+DROP TABLE IF EXISTS tournament;
+DROP TABLE IF EXISTS users;
 
-CREATE TABLE user (
+
+
+
+CREATE TABLE users (
   id serial PRIMARY KEY,
   username varchar(255) UNIQUE NOT NULL,
   pw_hash varchar(255) NOT NULL,
@@ -39,7 +42,7 @@ CREATE TABLE player_tournament_join (
 CREATE TABLE league (
   id serial PRIMARY KEY,
   name varchar(255) NOT NULL,
-  commish_id integer REFERENCES user(id) NOT NULL,
+  commish_id integer REFERENCES users(id) NOT NULL,
   private boolean default false,
   pw_hash varchar(255)
 );
@@ -48,7 +51,7 @@ CREATE TABLE league (
 CREATE TABLE league_user (
   id serial PRIMARY KEY,
   name varchar(255) NOT NULL,
-  user_id integer REFERENCES user(id) NOT NULL,
+  user_id integer REFERENCES users(id) NOT NULL,
   league_id integer REFERENCES league(id) NOT NULL,
   winnings integer default 0
 );
