@@ -1,6 +1,4 @@
-const { Client } = require('pg')
-const client = new Client()
-
+const client = require('../psql/server.js');
 const User = require('../models/user.js');
 
 
@@ -14,35 +12,26 @@ class UserController {
         // return json object of neccessary info
     }
 
-    static createUser (params) {
+     static createUser (params) {
         // create User object & validate correct params
         // if good: send to DB
         // if bad send bad response back
+        return client.query(`
+            INSERT INTO accounts
+                (username, pw_hash, email, session_token)
+            VALUES
+                ($1, $2, $3, $4)
+            RETURNING
+                *
+        `)
+        .then(res => {
+            console.log(res.rows[0]);
 
-        await client.connect()
-
-        const user = await client.query('''
-                INSERT INTO users
-                    (username, pw_hash, email, session_token)
-                VALUES
-                    ($1, $2, $3, $4)
-                RETURNING
-                    *
-            ''', [
-                params.username,
-                params.pw_hash,
-                params.email,
-                params.session_token
-            ]
-        );
-
-        await client.end()
-
-        console.log(user);
-
-
-        // create user object with User class
-        return user;
+            return res.rows[0];
+        }).catch(e => {
+            debugger;
+            console.error(e.stack)
+        });
     }
 
     static getUser (params) {

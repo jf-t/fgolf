@@ -1,4 +1,5 @@
 const routes = require('express').Router();
+const crypto = require('crypto');
 
 const UserController = require('../controllers/user_controller');
 
@@ -14,20 +15,38 @@ routes.post('/auth', (req, res) => {
 });
 
 routes.post('/user', (req, res) => {
+    const secret = 'abcdefg';
+    const pw_hash = crypto.createHmac('sha256', secret)
+                       .update(req.body.password)
+                       .digest('hex');
+
+
+    const currentTime = new Date();
+    const token = crypto.createHmac('sha256', secret)
+                       .update(currentTime.toUTCString())
+                       .digest('hex');
+
+
     let params = {
         'username': res.username,
-        'pw_hash': 'password', // needs to be encrypted
+        'pw_hash': pw_hash,
         'email': res.email,
-        'session_token': 'token' // need to generate tokens
+        'session_token': token // need to generate tokens
     };
 
-    let user = UserController.createUser(req.body);
+    let response = UserController.createUser(req.body);
 
-    if (user) {
-        res.status(200).json(user.responseBody);
-    } else {
-        res.status(500).json({ "error": "500 - Server Error (Create User)" });
-    }
+    // user.subscribe(res => {
+    //     console.log(res);
+    //     debugger;
+    // });
+    // if (user) {
+    //     res.status(200).json(user.responseBody);
+    // } else {
+    //     res.status(500).json({ "error": "500 - Server Error (Create User)" });
+    // }
+
+    // res.status(200).json(response);
 });
 
 
