@@ -20,14 +20,18 @@ class UserController {
         ];
 
         db.query(sql, values, (err, res) => {
-            if (res) {
+            if (res && res.rows[0]) {
                 let user = new User(res.rows[0]);
 
                 // remove session token for auth route recursive function to work
                 user.sessionToken = null;
                 cb(user);
             } else {
-                cb (null, err);
+                if (!err) {
+                    cb (null, {'error': 'Bad Credentials'});
+                } else {
+                    cb(null, err);
+                }
             }
         });
     }
@@ -51,7 +55,7 @@ class UserController {
         ];
 
         db.query(sql, values, (err, res) => {
-            if (res) {
+            if (res && res.rows[0]) {
                 cb(new User(res.rows[0]));
             } else {
                 cb(null, err);
@@ -82,7 +86,6 @@ class UserController {
     }
 
     static updateSession(params, cb) {
-        console.log(params);
         let sql = `
             UPDATE
                 accounts
@@ -97,11 +100,9 @@ class UserController {
         let values = [params.token, params.userId];
 
         db.query(sql, values, (err, res) => {
-            if (res) {
-                console.log(res);
+            if (res && res.rows[0]) {
                 cb(new User(res.rows[0]));
             } else {
-                console.log(err);
                 cb(null, err);
             }
         });

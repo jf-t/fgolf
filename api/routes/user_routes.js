@@ -28,7 +28,6 @@ routes.post('/auth', (req, res) => {
                     .update(currentTime.toUTCString())
                     .digest('hex');
 
-                console.log(user);
                 let params = {
                     userId: user.id,
                     token
@@ -37,7 +36,7 @@ routes.post('/auth', (req, res) => {
                 UserController.updateSession(params, cb);
             }
         }
-    }
+    };
 
     UserController.login(params, cb);
 });
@@ -71,7 +70,7 @@ routes.post('/user', (req, res) => {
         } else {
             res.status(200).json(user.responseBody);
         }
-    }
+    };
 
     UserController.createUser(params, cb);
 });
