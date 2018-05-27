@@ -1,44 +1,110 @@
-const client = require('../psql/server.js');
 const User = require('../models/user.js');
 
+const db = require('../db');
 
 
 class UserController {
-    static login (params) {
-        // db query
-        // check if db object = params.username
-        //  and crypt(params.password)
+    static login (params, cb) {
+        let sql = `
+            SELECT
+                *
+            FROM
+                accounts
+            WHERE
+                accounts.username = $1 AND accounts.pw_hash = $2
+        `;
 
-        // return json object of neccessary info
+        let values = [
+            params.username,
+            params.pw_hash
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                let user = new User(res.rows[0]);
+
+                // remove session token for auth route recursive function to work
+                user.sessionToken = null;
+                cb(user);
+            } else {
+                cb (null, err);
+            }
+        });
     }
 
-     static createUser (params) {
-        // create User object & validate correct params
-        // if good: send to DB
-        // if bad send bad response back
-        return client.query(`
+
+     static createUser (params, cb) {
+        let sql = `
             INSERT INTO accounts
                 (username, pw_hash, email, session_token)
             VALUES
                 ($1, $2, $3, $4)
             RETURNING
                 *
-        `)
-        .then(res => {
-            console.log(res.rows[0]);
+        `;
 
-            return res.rows[0];
-        }).catch(e => {
-            debugger;
-            console.error(e.stack)
+        let values = [
+            params.username,
+            params.pw_hash,
+            params.email,
+            params.session_token
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                cb(new User(res.rows[0]));
+            } else {
+                cb(null, err);
+            }
         });
     }
 
-    static getUser (params) {
-        let userId = params.userId;
 
-        // query DB for user id
-        // then send user.publicInfo
+    static getUser (params) {
+        let sql = `
+            SELECT
+                *
+            FROM
+                accounts
+            WHERE
+                accounts.id = $1
+        `;
+
+        let values = [params.userId];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                cb(new User(res.rows[0]));
+            } else {
+                cb(null, err)
+            }
+        });
+    }
+
+    static updateSession(params, cb) {
+        console.log(params);
+        let sql = `
+            UPDATE
+                accounts
+            SET
+                session_token = $1
+            WHERE
+                id = $2
+            RETURNING
+                *
+        `;
+
+        let values = [params.token, params.userId];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                console.log(res);
+                cb(new User(res.rows[0]));
+            } else {
+                console.log(err);
+                cb(null, err);
+            }
+        });
     }
 }
 
