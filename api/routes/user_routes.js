@@ -24,7 +24,7 @@ routes.post('/auth', (req, res) => {
             } else {
                 // Create session token
                 const currentTime = new Date();
-                const token = crypto.createHmac('sha256', secret)
+                const token = crypto.createHmac('sha256', secret + req.body.password + req.body.username)
                     .update(currentTime.toUTCString())
                     .digest('hex');
 
@@ -51,7 +51,7 @@ routes.post('/user', (req, res) => {
 
     // Create session token
     const currentTime = new Date();
-    const token = crypto.createHmac('sha256', secret)
+    const token = crypto.createHmac('sha256', secret + req.body.password + req.body.username)
                        .update(currentTime.toUTCString())
                        .digest('hex');
 

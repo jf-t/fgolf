@@ -27,11 +27,7 @@ class UserController {
                 user.sessionToken = null;
                 cb(user);
             } else {
-                if (!err) {
-                    cb (null, {'error': 'Bad Credentials'});
-                } else {
-                    cb(null, err);
-                }
+                cb (null, err || {'error': 'Bad Credentials'});
             }
         });
     }
@@ -80,7 +76,7 @@ class UserController {
             if (res) {
                 cb(new User(res.rows[0]));
             } else {
-                cb(null, err)
+                cb(null, err || {'error': 'No User with that ID'})
             }
         });
     }
@@ -103,7 +99,30 @@ class UserController {
             if (res && res.rows[0]) {
                 cb(new User(res.rows[0]));
             } else {
-                cb(null, err);
+                cb(null, err || {'error': 'No user with that ID'});
+            }
+        });
+    }
+
+    static checkSession(params, cb) {
+        let sql = `
+            SELECT
+                *
+            FROM
+                accounts
+            WHERE
+                accounts.session_token = $1
+        `;
+
+        let values = [
+            params.sessionToken
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res && res.rows[0]) {
+                cb(new User(res.rows[0]));
+            } else {
+                cb(null, err || {'error': 'No user with that session token'});
             }
         });
     }
