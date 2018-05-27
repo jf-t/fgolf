@@ -19,3 +19,9 @@ INSERT INTO settings
     (league_id)
 VALUES
     (1);
+
+
+INSERT INTO tournament
+    (tid, name, starting_date, ending_date)
+VALUES
+    ('014', 'The Masters', '2018-04-05', '2018-04-08');
