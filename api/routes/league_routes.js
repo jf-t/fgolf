@@ -1,13 +1,14 @@
 const routes = require('express').Router();
 
-
 const LeagueController = require('../controllers/league_controller');
 const isAuthenticated = require('../utils/auth.js');
+
+
 
 routes.get('/leagues', isAuthenticated, (req, res) => {
     let user = req.app.get('user');
 
-    let cb = (err, leagues) => {
+    let cb = (league, err) => {
         if (err) {
             res.status(500).json(err);
         } else {
@@ -20,23 +21,24 @@ routes.get('/leagues', isAuthenticated, (req, res) => {
 
 
 routes.get('/league/:id', isAuthenticated, (req, res) => {
-    let cb = (err, league) => {
+    let cb = (league, err) => {
         if (err) {
             res.status(500).json(err);
         } else {
-            res.status(200).json(league);
+            res.status(200).json(league.responseBody);
         }
     };
 
     LeagueController.getLeague(req.params.id, cb);
 });
 
+
 routes.post('/league', isAuthenticated, (req, res) => {
-    let cb = (err, league) => {
+    let cb = (league, err) => {
         if (err) {
             res.status(500).json(err);
         } else {
-            res.status(200).json(league);
+            res.status(200).json(league.responseBody);
         }
     };
 
@@ -52,8 +54,9 @@ routes.post('/league', isAuthenticated, (req, res) => {
     LeagueController.createLeague(params, cb);
 });
 
+
 routes.post('/league/:id/signup', isAuthenticated, (req, res) => {
-    let cb = (err, league_account) => {
+    let cb = (league_account, err) => {
         if (err) {
             res.status(500).json(err);
         } else {
