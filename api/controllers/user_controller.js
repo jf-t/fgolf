@@ -1,4 +1,4 @@
-const User = require('../models/user.js');
+const User = require('../models/user');
 
 const db = require('../db');
 
@@ -60,7 +60,7 @@ class UserController {
     }
 
 
-    static getUser (params) {
+    static getUser (userId) {
         let sql = `
             SELECT
                 *
@@ -70,7 +70,7 @@ class UserController {
                 accounts.id = $1
         `;
 
-        let values = [params.userId];
+        let values = [userId];
 
         db.query(sql, values, (err, res) => {
             if (res) {
@@ -104,7 +104,7 @@ class UserController {
         });
     }
 
-    static checkSession(params, cb) {
+    static checkSession(sessionToken, cb) {
         let sql = `
             SELECT
                 *
@@ -115,7 +115,7 @@ class UserController {
         `;
 
         let values = [
-            params.sessionToken
+            sessionToken
         ];
 
         db.query(sql, values, (err, res) => {

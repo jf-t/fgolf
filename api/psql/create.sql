@@ -51,10 +51,10 @@ CREATE TABLE league (
 
 CREATE TABLE league_account (
   id serial PRIMARY KEY,
-  name varchar(255) NOT NULL,
   account_id integer REFERENCES accounts(id) NOT NULL,
   league_id integer REFERENCES league(id) NOT NULL,
-  winnings integer default 0
+  winnings integer default 0,
+  unique (account_id, league_id)
 );
 
 CREATE TABLE league_tournament (

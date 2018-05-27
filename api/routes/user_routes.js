@@ -76,6 +76,7 @@ routes.post('/user', (req, res) => {
 });
 
 
+// route needs to be changed to have ID
 routes.get('/user', (req, res) => {
     let cb = (user, err) => {
         if (err) {
@@ -85,7 +86,7 @@ routes.get('/user', (req, res) => {
         }
     }
 
-    UserController.getUser(req.body, cb);
+    UserController.getUser(req.body.userId, cb);
 });
 
 module.exports = routes;
