@@ -20,8 +20,7 @@ CREATE TABLE accounts (
 );
 
 CREATE TABLE tournament (
-  id serial PRIMARY KEY,
-  tid integer NOT NULL,
+  tid integer PRIMARY KEY,
   name varchar(255) NOT NULL,
   starting_date varchar(255) NOT NULL, -- iso format?
   ending_date varchar(255) NOT NULL -- iso format?
@@ -37,7 +36,7 @@ CREATE TABLE player (
 CREATE TABLE player_tournament (
   id serial PRIMARY KEY,
   player_id integer REFERENCES player(id) NOT NULL,
-  tournament_id integer REFERENCES tournament(id) NOT NULL,
+  tournament_id integer REFERENCES tournament(tid) NOT NULL,
   unique (player_id, tournament_id),
 
   total integer default 0,
@@ -69,7 +68,7 @@ CREATE TABLE league_account (
 
 CREATE TABLE league_tournament (
   id serial PRIMARY KEY,
-  tourmament_id integer REFERENCES tournament(id) NOT NULL
+  tournament_id integer REFERENCES tournament(tid) NOT NULL
 );
 
 CREATE TABLE account_tournament_results (
