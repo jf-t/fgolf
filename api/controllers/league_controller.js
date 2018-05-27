@@ -71,6 +71,23 @@ class LeagueController {
         });
     }
 
+    static initiateSettings(league) {
+        const sql = `
+            INSERT INTO settings
+                (league_id)
+            VALUES
+                ($1)
+        `;
+
+        const values = [league.id];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                console.log("Settings Initiated on League " + league.id);
+            }
+        });
+    }
+
 
     static updateLeague (params, cb) {
         const sql = `

@@ -20,7 +20,7 @@ routes.post('/auth', (req, res) => {
             res.status(500).json(err);
         } else {
             if (user.sessionToken) {
-                res.status(200).json(user.responseBody);
+                res.status(200).json(user);
             } else {
                 // Create session token
                 const currentTime = new Date();

@@ -1,10 +1,9 @@
-DROP TABLE IF EXISTS league_user;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS account_tournament_results;
 DROP TABLE IF EXISTS league_tournament;
 DROP TABLE IF EXISTS league_account;
 DROP TABLE IF EXISTS league;
-DROP TABLE IF EXISTS player_tournament_join;
+DROP TABLE IF EXISTS player_tournament;
 DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS tournament;
 DROP TABLE IF EXISTS accounts;
@@ -24,20 +23,31 @@ CREATE TABLE tournament (
   id serial PRIMARY KEY,
   tid integer NOT NULL,
   name varchar(255) NOT NULL,
-  starting_date varchar(255) NOT NULL,
-  ending_date varchar(255) NOT NULL
+  starting_date varchar(255) NOT NULL, -- iso format?
+  ending_date varchar(255) NOT NULL -- iso format?
 );
 
 CREATE TABLE player (
   id serial PRIMARY KEY,
   pga_id integer NOT NULL,
   name varchar(255) NOT NULL
+  -- will add more from pga website
 );
 
-CREATE TABLE player_tournament_join (
+CREATE TABLE player_tournament (
   id serial PRIMARY KEY,
   player_id integer REFERENCES player(id) NOT NULL,
-  tournament_id integer REFERENCES tournament(id) NOT NULL
+  tournament_id integer REFERENCES tournament(id) NOT NULL,
+  unique (player_id, tournament_id),
+
+  total integer default 0,
+  today integer default 0,
+  thru integer default 0,
+
+  r1 integer,
+  r2 integer,
+  r3 integer,
+  r4 integer
 );
 
 CREATE TABLE league (
@@ -66,7 +76,7 @@ CREATE TABLE account_tournament_results (
   id serial PRIMARY KEY,
   league_tournament_id integer REFERENCES league_tournament(id) NOT NULL,
   league_account_id integer REFERENCES league_account(id) NOT NULL,
-  score integer default 0
+  players integer[]
 );
 
 CREATE TABLE settings (
