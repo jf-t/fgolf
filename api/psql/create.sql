@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS account_player_tournament;
 DROP TABLE IF EXISTS account_tournament_results;
 DROP TABLE IF EXISTS league_tournament;
 DROP TABLE IF EXISTS league_account;
@@ -68,13 +69,19 @@ CREATE TABLE league_account (
 CREATE TABLE league_tournament (
   id serial PRIMARY KEY,
   tournament_id character(3) REFERENCES tournament(tid) NOT NULL
+  -- Probably will need more information
 );
 
 CREATE TABLE account_tournament_results (
   id serial PRIMARY KEY,
   league_tournament_id integer REFERENCES league_tournament(id) NOT NULL,
-  league_account_id integer REFERENCES league_account(id) NOT NULL,
-  players integer[]
+  league_account_id integer REFERENCES league_account(id) NOT NULL
+);
+
+CREATE TABLE account_player_tournament (
+    id serial PRIMARY KEY,
+    account_tournament_results_id integer REFERENCES account_tournament_results(id) NOT NULL,
+    player_tournament_id integer REFERENCES player_tournament(id)
 );
 
 CREATE TABLE settings (
