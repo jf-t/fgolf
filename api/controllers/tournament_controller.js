@@ -127,7 +127,6 @@ class TournamentController {
                         cb(null, err);
                     } else {
                         if (success) {index += 1 }
-                        console.log(index);
 
                         if (index === players.length) {
                             cb({'message': 'Player Update Successful'});
@@ -150,6 +149,30 @@ class TournamentController {
                     PlayerController.updatePlayerTournamentScore(params, innerCb);
                 });
             });
+        });
+    }
+
+
+    static getLeaderboard(tournamentId, cb) {
+        const sql = `
+            SELECT
+                *
+            FROM
+                player_tournament
+            WHERE
+                tournament_id = $1
+            ORDER BY
+                total ASC
+        `;
+
+        const values = [tournamentId];
+
+        db.query(sql, values, (err, res) => {
+            if (res && res.rows[0]) {
+                cb(res.rows);
+            } else {
+                cb(null, err);
+            }
         });
     }
 

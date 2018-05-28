@@ -107,11 +107,8 @@ class PlayerController {
             params.playerId
         ];
 
-        console.log(values);
-
         db.query(sql, values, (err, res) => {
             if (res && res.rows[0]) {
-                console.log(res.rows[0]);
                 cb(true);
             } else {
                 cb(null, err);

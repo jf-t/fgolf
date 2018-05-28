@@ -42,7 +42,6 @@ routes.post('/tournament/:id/initiate', (req, res) => {
     // use statdata.pgatour to scrape and update tournament scores
     let cb = (message, err) => {
         if (err) {
-            console.log(err);
             res.status(500).json(err);
         } else {
             res.status(200).json(message);
@@ -56,7 +55,6 @@ routes.post('/tournament/:id/update', (req, res) => {
     // use statdata.pgatour to scrape and update tournament scores
     let cb = (message, err) => {
         if (err) {
-            console.log(err);
             res.status(500).json(err);
         } else {
             res.status(200).json(message);
@@ -65,6 +63,19 @@ routes.post('/tournament/:id/update', (req, res) => {
     TournamentController.updateTournamentScores(req.params.id, cb);
 });
 
+
+
+routes.get('/tournament/:id/leaderboard', (req, res) => {
+    let cb = (leaderboard, err) => {
+        if (err) {
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(leaderboard);
+        }
+    }
+
+    TournamentController.getLeaderboard(req.params.id, cb);
+});
 
 
 
