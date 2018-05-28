@@ -37,6 +37,27 @@ class LeagueController {
         });
     }
 
+    static getLeague (leagueId, cb) {
+        const sql = `
+            SELECT
+                *
+            FROM
+                league
+            WHERE
+                id = $1
+        `;
+
+        const values = [leagueId];
+
+        db.query(sql, values, (err, res) => {
+            if (res && res.rows[0]) {
+                cb(new League(res.rows[0]));
+            } else {
+                cb(null, err || {'error': 'No League with that ID'});
+            }
+        });
+    }
+
     static createLeague (params, cb) {
         const sql = `
             INSERT INTO league
@@ -114,28 +135,6 @@ class LeagueController {
                 cb(new League(res.rows[0]));
             } else {
                 cb(null, err || {'error': 'No League with that ID'})
-            }
-        });
-    }
-
-
-    static getLeague (leagueId, cb) {
-        const sql = `
-            SELECT
-                *
-            FROM
-                league
-            WHERE
-                id = $1
-        `;
-
-        const values = [leagueId];
-
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                cb(new League(res.rows[0]));
-            } else {
-                cb(null, err || {'error': 'No League with that ID'});
             }
         });
     }
