@@ -6,6 +6,9 @@ class Tournament {
         // need to be iso format
         this.startingDate = params.starting_date;
         this.endingDate = params.ending_date;
+
+        // players probably will be null at first
+        this.players = params.players;
     }
 
     get responseBody()  {
@@ -17,6 +20,7 @@ class Tournament {
         };
     }
 
+    // just in case i forget
     get id () {
         return this.tid;
     }

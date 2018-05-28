@@ -38,6 +38,33 @@ routes.post('/tournament', (req, res) => {
     TournamentController.createTournament(params, cb);
 });
 
+routes.post('/tournament/:id/initiate', (req, res) => {
+    // use statdata.pgatour to scrape and update tournament scores
+    let cb = (message, err) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(message);
+        }
+    };
+    TournamentController.initiateTournamentPlayers(req.params.id, cb);
+});
+
+
+routes.post('/tournament/:id/update', (req, res) => {
+    // use statdata.pgatour to scrape and update tournament scores
+    let cb = (message, err) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(message);
+        }
+    };
+    TournamentController.updateTournamentScores(req.params.id, cb);
+});
+
 
 
 
