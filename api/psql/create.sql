@@ -77,7 +77,8 @@ CREATE TABLE league_tournament (
 CREATE TABLE account_tournament_results (
   id serial PRIMARY KEY,
   league_tournament_id integer REFERENCES league_tournament(id) NOT NULL,
-  league_account_id integer REFERENCES league_account(id) NOT NULL
+  league_account_id integer REFERENCES league_account(id) NOT NULL,
+  unique(league_tournament_id, league_account_id)
 );
 
 CREATE TABLE account_player_tournament (

@@ -213,6 +213,66 @@ class LeagueController {
             }
         });
     }
+
+    static selectPlayers(params, cb) {
+        const sql = `
+            INSERT INTO account_tournament_results
+                (league_tournament_id, league_account_id)
+            VALUES
+                ($1, $2)
+            RETURNING *
+        `;
+
+        const values = [
+            params.leagueTournamentId,
+            params.leagueAccountId
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                let accountTournamentResultsId = res.rows[0].id;
+
+                params.playerTournamentIds.forEach(playerTournamentId => {
+                    LeagueController.selectPlayer({
+                        playerTournamentId,
+                        accountTournamentResultsId
+                    });
+                });
+
+                cb({'message': 'Successfully Selected Players'});
+            }
+        });
+    }
+
+    static selectPlayer (params, cb) {
+        const sql = `
+            INSERT INTO account_player_tournament
+                (account_tournament_results_id, player_tournament_id)
+            VALUES
+                ($1, $2)
+            RETURNING *
+        `;
+
+        const values = [
+            params.accountTournamentResultsId,
+            params.playerTournamentId
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (!cb) {
+            } else {
+                if (!cb) {
+                    console.log(res, err);
+                } else {
+                    if (res && res.rows[0]) {
+                        cb(res.rows[0]);
+                    } else {
+                        cb(null, err);
+                    }
+                }
+            }
+        });
+    }
 }
 
 module.exports = LeagueController;
