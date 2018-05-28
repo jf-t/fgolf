@@ -186,6 +186,72 @@ class TournamentController {
         });
     }
 
+    static getLeagueTournament (leagueTournamentId, cb) {
+        const sql = `
+            SELECT
+                *
+            FROM
+                league_tournament
+            JOIN
+                account_tournament_results
+            ON
+                account_tournament_results.league_tournament_id = league_tournament.id
+            WHERE
+                league_tournament.id = $1
+        `;
+
+        const values = [leagueTournamentId];
+
+        db.query(sql, values, (err, res) => {
+            if (res && res.rows[0]) {
+                cb(res.rows);
+            }
+        });
+    }
+
+    static createLeagueTournamentLeaderboard (league_tournament_id, cb) {
+        const sql = `
+            SELECT
+                account.username, account.id, COUNT(player_tournament.total) as total_score, player.name as player_name, player.id as player_id
+            FROM
+                account
+            JOIN
+                league_account
+            ON
+                account.id = league_account.account_id
+            JOIN
+                account_tournament_results
+            ON
+                account_tournament_results.league_account_id = league_account.id
+            JOIN
+                account_player_tournament
+            ON
+                account_player_tournament.account_tournament_results_id = account_tournament_results.id
+            JOIN
+                league_tournament
+            ON
+                league_tournament.id = account_tournament_results.league_tournament.id
+            JOIN
+                player_tournament
+            ON
+                account_player_tournament.player_tournament_id = player_tournament.id
+            JOIN
+                player
+            ON
+                player_tournament.player_id = player.pga_id
+            WHERE
+                league_tournament.id = $1
+        `;
+
+        const values = [leagueTournamentId];
+
+        db.query(sql, values, (err, res) => {
+            if (res && res.rows[0]) {
+                cb(res.rows);
+            }
+        });
+    }
+
 }
 
 
