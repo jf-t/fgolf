@@ -3,6 +3,8 @@ const db = require('../db');
 
 
 const Tournament = require('../models/tournament');
+const Player = require('../models/player');
+
 const PlayerController = require('./player_controller');
 
 
@@ -159,6 +161,10 @@ class TournamentController {
                 *
             FROM
                 player_tournament
+            JOIN
+                player
+            ON
+                player.pga_id = player_tournament.player_id
             WHERE
                 tournament_id = $1
             ORDER BY
@@ -169,6 +175,10 @@ class TournamentController {
 
         db.query(sql, values, (err, res) => {
             if (res && res.rows[0]) {
+                let formattedPlayers = [];
+                res.rows.forEach(player => {
+                    formattedPlayers.push(new Player(player));
+                });
                 cb(res.rows);
             } else {
                 cb(null, err);
