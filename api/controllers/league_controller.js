@@ -1,7 +1,7 @@
 const League = require('../models/league');
 
 const db = require('../db');
-
+const TournamentController = require('./tournament_controller');
 
 class LeagueController {
     static getUserLeagues(userId, cb) {
@@ -162,6 +162,54 @@ class LeagueController {
                 cb({'message': 'Successfully enrolled'})
             } else {
                 cb(err);
+            }
+        });
+    }
+
+    static createSeason (params, cb) {
+        let contCb = (tournaments, err) => {
+            if (err) {
+                console.log(err);
+                cb(null, err);
+            } else {
+                tournaments.forEach(tournament => {
+                    LeagueController.createLeagueTournament({
+                        leagueId: params.leagueId,
+                        tournamentId: tournament.tid
+                    });
+                });
+
+                cb(tournaments);
+            }
+        };
+
+        TournamentController.getSeasonByYear(params.year, contCb);
+    }
+
+
+    static createLeagueTournament (params, cb) {
+        const sql = `
+            INSERT INTO league_tournament
+                (league_id, tournament_id)
+            VALUES
+                ($1, $2)
+            RETURNING *
+        `;
+
+        const values = [
+            params.leagueId,
+            params.tournamentId
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                if (!cb) {
+                    console.log({'message': 'Created League Tournament ' + res.rows[0].tournament_id});
+                } else {
+                    cb(res.rows[0]);
+                }
+            } else {
+                console.error(err);
             }
         });
     }

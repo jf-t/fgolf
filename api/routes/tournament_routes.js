@@ -28,9 +28,17 @@ routes.post('/tournament', (req, res) => {
         }
     }
 
+    let season = null;
+    if (!req.body.year) {
+        season = parseInt(req.body.startingDate.split('-')[0]);
+    } else {
+        season = req.body.year;
+    }
+
     const params = {
         'tid': req.body.tid,
         'name': req.body.name,
+        'season': season,
         'startingDate': req.body.startingDate,
         'endingDate': req.body.endingDate
     };

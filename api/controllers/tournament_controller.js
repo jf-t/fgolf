@@ -31,20 +31,46 @@ class TournamentController {
         });
     }
 
+    static getSeasonByYear (year, cb) {
+        const sql = `
+            SELECT
+                *
+            FROM
+                tournament
+            WHERE
+                season = $1
+        `;
+
+        const values = [year];
+
+        db.query(sql, values, (err, res) => {
+            if (res && res.rows[0]) {
+                const formattedTournaments = res.rows.map(tournament => {
+                    let formattedTournament = new Tournament(tournament);
+                    return formattedTournament.responseBody;
+                });
+
+                cb(formattedTournaments);
+            } else {
+                cb(null, err);
+            }
+        });
+    }
+
 
     static createTournament (params, cb) {
         const sql = `
             INSERT INTO tournament
-                (tid, name, starting_date, ending_date)
+                (tid, name, season, starting_date, ending_date)
             VALUES
-                ($1, $2, $3, $4)
-            RETURNING
-                *
+                ($1, $2, $3, $4, $5)
+            RETURNING *
         `;
 
         const values = [
             params.tid,
             params.name,
+            params.season,
             params.startingDate,
             params.endingDate
         ];

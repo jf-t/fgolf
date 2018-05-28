@@ -23,6 +23,7 @@ CREATE TABLE accounts (
 CREATE TABLE tournament (
   tid character(3) PRIMARY KEY,
   name varchar(255) NOT NULL,
+  season integer NOT NULL, -- (year)
   starting_date varchar(255) NOT NULL, -- iso format?
   ending_date varchar(255) NOT NULL -- iso format?
 );
@@ -68,6 +69,7 @@ CREATE TABLE league_account (
 
 CREATE TABLE league_tournament (
   id serial PRIMARY KEY,
+  league_id integer REFERENCES league(id) NOT NULL,
   tournament_id character(3) REFERENCES tournament(tid) NOT NULL
   -- Probably will need more information
 );

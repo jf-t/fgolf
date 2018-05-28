@@ -73,5 +73,23 @@ routes.post('/league/:id/signup', isAuthenticated, (req, res) => {
     LeagueController.enrollUserInLeague(params, cb);
 });
 
+routes.post('/league/:id/initialize/:year', (req, res) => {
+    let cb = (tournaments, err) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(tournaments);
+        }
+    };
+
+    let params = {
+        'year': req.params.year,
+        'leagueId': req.params.id
+    };
+    
+    LeagueController.createSeason(params, cb);
+});
+
 
 module.exports = routes;

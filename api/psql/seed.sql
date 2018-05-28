@@ -22,6 +22,6 @@ VALUES
 
 
 INSERT INTO tournament
-    (tid, name, starting_date, ending_date)
+    (tid, name, season, starting_date, ending_date)
 VALUES
-    ('014', 'The Masters', '2018-04-05', '2018-04-08');
+    ('014', 'The Masters', 2018, '2018-04-05', '2018-04-08');
