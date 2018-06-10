@@ -334,6 +334,39 @@ class LeagueController {
             }
         });
     }
+
+    static getAccountTournamentResults (params, cb) {
+        const sql = `
+            SELECT
+                *
+            FROM
+                account_tournament_results
+            JOIN
+                account_player_tournament
+            ON
+                account_player_tournament.account_tournament_results_id = account_tournament_results.id
+            WHERE
+                account_tournament_results.league_tournament_id = $1 AND
+                account_tournament_results.league_account_id = $2
+        `;
+
+        const values = [
+            params.leagueTournamentId,
+            params.leagueAccountId
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                console.log(res.rows[1]);
+                cb(res.rows);
+            } else {
+                cb(null, err || {
+                    'error': 'No Account Tournament Results with those params',
+                    'params': params
+                });
+            }
+        });
+    }
 }
 
 module.exports = LeagueController;

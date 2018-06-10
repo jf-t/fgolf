@@ -106,15 +106,11 @@ routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeague
         if (err) {
             res.status(500).json(err);
         } else {
-            let leagueAccountId = req.app.get('user').leagueAccountId;
-
             let params = {
-                leagueAccountId: leagueAccountId,
+                leagueAccountId: req.app.get('user').leagueAccountId,
                 leagueTournamentId: leagueTournament.id,
                 playerIds: req.body.playerIds
             }
-
-            console.log(params);
 
             LeagueController.selectPlayers(params, finalCb);
         }
@@ -124,6 +120,38 @@ routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeague
         tournamentId: req.body.tournamentId,
         leagueId: parseInt(req.params.id)
     };
+
+    LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
+});
+
+routes.get('/league/:id/tournament/:tid/players', utils.isAuthenticated, utils.getLeagueAccountId, (req, res) => {
+    let finalCb = (players, err) => {
+        if (err) {
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(players);
+        }
+    }
+
+
+    let leagueTournamentCb = (leagueTournament, err) => {
+        if (err) {
+            res.status(500).json(err);
+        } else {
+            let params = {
+                leagueAccountId: req.app.get('user').leagueAccountId,
+                leagueTournamentId: leagueTournament.id
+            }
+
+            LeagueController.getAccountTournamentResults(params, finalCb);
+        }
+    };
+
+    let leagueTournamentParams = {
+        tournamentId: req.params.tid,
+        leagueId: parseInt(req.params.id)
+    };
+    console.log(leagueTournamentParams);
 
     LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });
