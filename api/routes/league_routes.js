@@ -1,11 +1,11 @@
 const routes = require('express').Router();
 
 const LeagueController = require('../controllers/league_controller');
-const isAuthenticated = require('../utils/auth.js');
+const utils = require('../utils/auth.js');
 
 
 
-routes.get('/leagues', isAuthenticated, (req, res) => {
+routes.get('/leagues', utils.isAuthenticated, (req, res) => {
     let user = req.app.get('user');
 
     let cb = (league, err) => {
@@ -20,7 +20,7 @@ routes.get('/leagues', isAuthenticated, (req, res) => {
 });
 
 
-routes.get('/league/:id', isAuthenticated, (req, res) => {
+routes.get('/league/:id', utils.isAuthenticated, (req, res) => {
     let cb = (league, err) => {
         if (err) {
             res.status(500).json(err);
@@ -33,7 +33,7 @@ routes.get('/league/:id', isAuthenticated, (req, res) => {
 });
 
 
-routes.post('/league', isAuthenticated, (req, res) => {
+routes.post('/league', utils.isAuthenticated, (req, res) => {
     let cb = (league, err) => {
         if (err) {
             res.status(500).json(err);
@@ -55,7 +55,7 @@ routes.post('/league', isAuthenticated, (req, res) => {
 });
 
 
-routes.post('/league/:id/signup', isAuthenticated, (req, res) => {
+routes.post('/league/:id/signup', utils.isAuthenticated, (req, res) => {
     let cb = (league_account, err) => {
         if (err) {
             res.status(500).json(err);
@@ -91,9 +91,9 @@ routes.post('/league/:id/initialize/:year', (req, res) => {
     LeagueController.createSeason(params, cb);
 });
 
-
-route.post('/league/:id/select_players', (req, res) => {
-    let cb = (message, err) => {
+// params: tournamentId, playerIds
+routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeagueAccountId, (req, res) => {
+    let finalCb = (message, err) => {
         if (err) {
             res.status(500).json(err);
         } else {
@@ -101,18 +101,31 @@ route.post('/league/:id/select_players', (req, res) => {
         }
     };
 
-    // Need to get leagueAccountId from league_id and account_id
-    // Get league_tournament_id from tournament_id in req.body
-    // playerTournamentIds from req.body either from player_id and tournament_id
-    //    or just player_tournament_id
+    let leagueTournamentCb = (leagueTournament, err) => {
 
-    let params = {
-        leagueAccountId: leagueAccountId,
-        leagueTournamentId: leagueTournamentId,
-        playerTournamentIds: []
-    }
+        if (err) {
+            res.status(500).json(err);
+        } else {
+            let leagueAccountId = req.app.get('user').leagueAccountId;
 
-    LeagueController.selectPlayers(params, cb);
+            let params = {
+                leagueAccountId: leagueAccountId,
+                leagueTournamentId: leagueTournament.id,
+                playerIds: req.body.playerIds
+            }
+
+            console.log(params);
+
+            LeagueController.selectPlayers(params, finalCb);
+        }
+    };
+
+    let leagueTournamentParams = {
+        tournamentId: req.body.tournamentId,
+        leagueId: parseInt(req.params.id)
+    };
+
+    LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });
 
 

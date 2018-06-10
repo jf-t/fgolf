@@ -212,29 +212,6 @@ class TournamentController {
         });
     }
 
-    static getLeagueTournament (leagueTournamentId, cb) {
-        const sql = `
-            SELECT
-                *
-            FROM
-                league_tournament
-            JOIN
-                account_tournament_results
-            ON
-                account_tournament_results.league_tournament_id = league_tournament.id
-            WHERE
-                league_tournament.id = $1
-        `;
-
-        const values = [leagueTournamentId];
-
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                cb(res.rows);
-            }
-        });
-    }
-
     static createLeagueTournamentLeaderboard (league_tournament_id, cb) {
         const sql = `
             SELECT

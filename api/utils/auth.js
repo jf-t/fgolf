@@ -1,7 +1,9 @@
 const UserController = require('../controllers/user_controller');
+const LeagueController = require('../controllers/league_controller');
 
 const isAuthenticated = (req, res, next) => {
     let sessionToken = req.get('sessionToken');
+
     if (!sessionToken) {
         res.status(500).json({'error': 'Not Authenticated! - Send Token Header'});
     } else {
@@ -15,8 +17,37 @@ const isAuthenticated = (req, res, next) => {
             }
         }
 
-        UserController.checkSession(req.get('sessionToken'), cb);
+        UserController.checkSession(sessionToken, cb);
     }
+
 };
 
-module.exports = isAuthenticated;
+const getLeagueAccountId = (req, res, next) => {
+    let user = req.app.get('user');
+
+
+    let accountId = user.id;
+    let leagueId = req.params.id;
+
+
+    let cb = (leagueAccountId, err) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json({'error': err});
+        } else {
+            user.leagueAccountId = leagueAccountId;
+
+            req.app.set('user', user);
+            next();
+        }
+    }
+
+    let params = { leagueId, accountId };
+
+    LeagueController.getLeagueAccountId(params, cb);
+};
+
+module.exports = {
+    isAuthenticated: isAuthenticated,
+    getLeagueAccountId: getLeagueAccountId
+};

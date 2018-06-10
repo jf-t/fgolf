@@ -1,11 +1,11 @@
 const routes = require('express').Router();
 
 const TournamentController = require('../controllers/tournament_controller');
-const isAuthenticated = require('../utils/auth.js');
+const utils = require('../utils/auth.js');
 
 
 
-routes.get('/tournament/:id', isAuthenticated, (req, res) => {
+routes.get('/tournament/:id', utils.isAuthenticated, (req, res) => {
     let cb = (tournament, err) => {
         if (err) {
             res.status(500).json(err);
@@ -18,7 +18,7 @@ routes.get('/tournament/:id', isAuthenticated, (req, res) => {
 });
 
 
-routes.post('/tournament', (req, res) => {
+routes.post('/tournament', utils.isAuthenticated, (req, res) => {
     let cb = (tournament, err) => {
         if (err) {
             console.log(err);
@@ -46,7 +46,7 @@ routes.post('/tournament', (req, res) => {
     TournamentController.createTournament(params, cb);
 });
 
-routes.post('/tournament/:id/initiate', (req, res) => {
+routes.post('/tournament/:id/initiate', utils.isAuthenticated, (req, res) => {
     // use statdata.pgatour to scrape and update tournament scores
     let cb = (message, err) => {
         if (err) {
@@ -59,7 +59,7 @@ routes.post('/tournament/:id/initiate', (req, res) => {
 });
 
 
-routes.post('/tournament/:id/update', (req, res) => {
+routes.post('/tournament/:id/update', utils.isAuthenticated, (req, res) => {
     // use statdata.pgatour to scrape and update tournament scores
     let cb = (message, err) => {
         if (err) {
@@ -73,7 +73,7 @@ routes.post('/tournament/:id/update', (req, res) => {
 
 
 
-routes.get('/tournament/:id/leaderboard', (req, res) => {
+routes.get('/tournament/:id/leaderboard', utils.isAuthenticated, (req, res) => {
     let cb = (leaderboard, err) => {
         if (err) {
             res.status(500).json(err);

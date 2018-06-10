@@ -6,6 +6,9 @@ class User {
 
         this.email = params.email;
         this.sessionToken = params.session_token;
+
+        // this is set if using league routes in middleware
+        this.leagueAccountId = null;
     }
 
 

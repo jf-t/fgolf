@@ -140,6 +140,31 @@ class LeagueController {
     }
 
 
+    static getLeagueAccountId(params, cb) {
+        const sql = `
+            SELECT
+                id
+            FROM
+                league_account
+            WHERE
+                league_id = $1 AND account_id = $2
+        `;
+
+        const values = [
+            params.leagueId,
+            params.accountId
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                cb(res.rows[0].id);
+            } else {
+                cb(null, err);
+            }
+        });
+    }
+
+
     static enrollUserInLeague(params, cb) {
         // Validate that account_id, league_id are unique
 
@@ -161,7 +186,7 @@ class LeagueController {
             if (res && res.body[0]) {
                 cb({'message': 'Successfully enrolled'})
             } else {
-                cb(err);
+                cb(null, err);
             }
         });
     }
@@ -184,6 +209,33 @@ class LeagueController {
         };
 
         TournamentController.getSeasonByYear(params.year, contCb);
+    }
+
+
+
+    static getLeagueTournament (params, cb) {
+        const sql = `
+            SELECT
+                *
+            FROM
+                league_tournament
+            WHERE
+                league_id = $1 AND tournament_id = $2
+        `;
+
+        const values = [
+            params.leagueId,
+            params.tournamentId
+        ];
+
+        db.query(sql, values, (err, res) => {
+
+            if (res && res.rows[0]) {
+                cb(res.rows[0]);
+            } else {
+                cb(null, err);
+            }
+        });
     }
 
 
@@ -215,6 +267,7 @@ class LeagueController {
     }
 
     static selectPlayers(params, cb) {
+        // create account_tournament_results for account_player_tournament to reference
         const sql = `
             INSERT INTO account_tournament_results
                 (league_tournament_id, league_account_id)
@@ -232,9 +285,9 @@ class LeagueController {
             if (res) {
                 let accountTournamentResultsId = res.rows[0].id;
 
-                params.playerTournamentIds.forEach(playerTournamentId => {
+                params.playerIds.forEach(playerId => {
                     LeagueController.selectPlayer({
-                        playerTournamentId,
+                        playerId,
                         accountTournamentResultsId
                     });
                 });
@@ -249,17 +302,25 @@ class LeagueController {
             INSERT INTO account_player_tournament
                 (account_tournament_results_id, player_tournament_id)
             VALUES
-                ($1, $2)
+                ($1, (
+                    SELECT
+                        id
+                    FROM
+                        player_tournament
+                    WHERE
+                        player_id = $2
+                ))
             RETURNING *
         `;
 
         const values = [
             params.accountTournamentResultsId,
-            params.playerTournamentId
+            params.playerId
         ];
 
         db.query(sql, values, (err, res) => {
             if (!cb) {
+                console.log('account_player_tournament ' + res.rows[0].id);
             } else {
                 if (!cb) {
                     console.log(res, err);
