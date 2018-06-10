@@ -124,20 +124,19 @@ routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeague
     LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });
 
-routes.get('/league/:id/tournament/:tid/players', utils.isAuthenticated, utils.getLeagueAccountId, (req, res) => {
-    let finalCb = (players, err) => {
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(players);
-        }
-    }
-
-
+routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountId, (req, res) => {
     let leagueTournamentCb = (leagueTournament, err) => {
         if (err) {
             res.status(500).json(err);
         } else {
+            let finalCb = (players, err) => {
+                if (err) {
+                    res.status(500).json(err);
+                } else {
+                    res.status(200).json(players);
+                }
+            }
+
             let params = {
                 leagueAccountId: req.app.get('user').leagueAccountId,
                 leagueTournamentId: leagueTournament.id
@@ -148,10 +147,9 @@ routes.get('/league/:id/tournament/:tid/players', utils.isAuthenticated, utils.g
     };
 
     let leagueTournamentParams = {
-        tournamentId: req.params.tid,
+        tournamentId: req.query.tid,
         leagueId: parseInt(req.params.id)
     };
-    console.log(leagueTournamentParams);
 
     LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });

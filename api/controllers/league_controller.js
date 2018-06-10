@@ -338,13 +338,21 @@ class LeagueController {
     static getAccountTournamentResults (params, cb) {
         const sql = `
             SELECT
-                *
+                player_tournament.*, player.name
             FROM
                 account_tournament_results
             JOIN
                 account_player_tournament
             ON
                 account_player_tournament.account_tournament_results_id = account_tournament_results.id
+            JOIN
+                player_tournament
+            ON
+                account_player_tournament.player_tournament_id = player_tournament.id
+            JOIN
+                player
+            ON
+                player_tournament.player_id = player.pga_id
             WHERE
                 account_tournament_results.league_tournament_id = $1 AND
                 account_tournament_results.league_account_id = $2
@@ -357,7 +365,6 @@ class LeagueController {
 
         db.query(sql, values, (err, res) => {
             if (res) {
-                console.log(res.rows[1]);
                 cb(res.rows);
             } else {
                 cb(null, err || {
