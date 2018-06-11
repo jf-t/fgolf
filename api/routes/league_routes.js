@@ -155,4 +155,22 @@ routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountI
 });
 
 
+routes.get('/league/:id/leaderboard', utils.isAuthenticated, (req, res) => {
+    let cb = (leaderboard, err) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(leaderboard);
+        }
+    };
+
+    let params = {
+        leagueId: req.params.id,
+        tournamentId: req.query.tid
+    }
+    LeagueController.getLeaderboard(params, cb);
+});
+
+
 module.exports = routes;

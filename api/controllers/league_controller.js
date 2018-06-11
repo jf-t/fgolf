@@ -356,6 +356,10 @@ class LeagueController {
             WHERE
                 account_tournament_results.league_tournament_id = $1 AND
                 account_tournament_results.league_account_id = $2
+            GROUP BY
+                account_tournament_results.id, player_tournament.id, player.pga_id
+            ORDER BY
+                player_tournament.total
         `;
 
         const values = [
@@ -367,12 +371,88 @@ class LeagueController {
             if (res) {
                 cb(res.rows);
             } else {
+                console.log(err);
                 cb(null, err || {
                     'error': 'No Account Tournament Results with those params',
                     'params': params
                 });
             }
         });
+    }
+
+    static getLeaderboard (params, cb) {
+        const sql = `
+            SELECT
+                league_tournament.id as league_tournament_id,
+                league_account.id as league_account_id,
+                accounts.username
+            FROM
+                league
+
+            JOIN
+                league_tournament
+            ON
+                league_tournament.league_id = league.id
+
+            JOIN
+                league_account
+            ON
+                league_account.id = league.id
+
+            JOIN
+                accounts
+            ON
+                accounts.id = league_account.account_id
+
+            WHERE
+                league_account.league_id = $1 AND
+                league_tournament.tournament_id = $2
+        `;
+
+        const values = [
+            params.leagueId,
+            params.tournamentId
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res) {
+                res.rows.forEach(user => {
+                    let results = [];
+                    let completeCb = (tournamentResults) => {
+                        results.push(tournamentResults);
+
+                        if (results.length === res.rows.length) {
+                            let score = 0;
+
+                            console.log(results[0]);
+                            results.forEach(team => {
+                                let max = team.length; // need to configure settings to count specific number of players
+                                for (var i = 0; i < max; i++) {
+                                    score += team[i].total;
+                                }
+                            });
+
+                            cb({ players: results, score });
+                        }
+                    }
+
+                    let params = {
+                        leagueTournamentId: user.league_tournament_id,
+                        leagueAccountId: user.league_account_id
+                    };
+
+                    LeagueController.getAccountTournamentResults(params, completeCb);
+                });
+            } else {
+                console.log(err);
+            }
+        });
+    }
+
+    static formattedLeaderboardEntry (results) {
+        // results = id, player_id, tournament_id, total, today, thru, r1, r2, r3, r4, name
+
+
     }
 }
 
