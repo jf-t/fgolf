@@ -181,7 +181,7 @@ class TournamentController {
     }
 
 
-    static getLeaderboard(tournamentId, cb) {
+    static getTournamentLeaderboard(tournamentId, cb) {
         const sql = `
             SELECT
                 *

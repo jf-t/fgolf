@@ -22,7 +22,7 @@ const isAuthenticated = (req, res, next) => {
 
 };
 
-const getLeagueAccountId = (req, res, next) => {
+const getLeagueAccountInfo = (req, res, next) => {
     let user = req.app.get('user');
 
 
@@ -47,7 +47,35 @@ const getLeagueAccountId = (req, res, next) => {
     LeagueController.getLeagueAccountId(params, cb);
 };
 
+const getAccountTournamentResultsId = (req, res, next) => {
+    if (req.query.tournamentId || req.body.tournamentId) {
+        let cb = (accountTournamentResultsId , err) => {
+            if (err) {
+                res.status(500).json({ 'error': err });
+            } else {
+                let user = res.app.get('user');
+                user.accountTournamentResultsId = accountTournamentResultsId;
+
+                req.app.set('user', user);
+                next();
+            }
+        };
+
+        let leagueAccountId = req.app.get('user').leagueAccountId;
+
+        let tournamentId = req.query.tournamentId ?
+                           req.query.tournamentId :
+                           req.body.tournamentId;
+
+
+        let params = { leagueAccountId, tournamentId };
+
+        LeagueController.getAccountTournamentResultsId(params, cb)
+    }
+};
+
 module.exports = {
     isAuthenticated: isAuthenticated,
-    getLeagueAccountId: getLeagueAccountId
+    getLeagueAccountInfo: getLeagueAccountInfo,
+    getAccountTournamentResultsId: getAccountTournamentResultsId
 };

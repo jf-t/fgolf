@@ -82,7 +82,7 @@ routes.get('/tournament/:id/leaderboard', utils.isAuthenticated, (req, res) => {
         }
     }
 
-    TournamentController.getLeaderboard(req.params.id, cb);
+    TournamentController.getTournamentLeaderboard(req.params.id, cb);
 });
 
 

@@ -266,35 +266,80 @@ class LeagueController {
         });
     }
 
-    static selectPlayers(params, cb) {
-        // create account_tournament_results for account_player_tournament to reference
+
+    static getAccountTournamentResultsId (params, cb) {
         const sql = `
-            INSERT INTO account_tournament_results
-                (league_tournament_id, league_account_id)
-            VALUES
-                ($1, $2)
-            RETURNING *
+            SELECT
+                id
+            FROM
+                account_tournament_results
+            WHERE
+                league_tournament_id = (
+                    SELECT
+                        id
+                    FROM
+                        league_tournament
+                    WHERE
+                        league_tournament.tournament_id = $1
+                ) AND league_account_id = $2
         `;
 
         const values = [
-            params.leagueTournamentId,
+            params.tournamentId,
             params.leagueAccountId
         ];
 
         db.query(sql, values, (err, res) => {
             if (res) {
-                let accountTournamentResultsId = res.rows[0].id;
-
-                params.playerIds.forEach(playerId => {
-                    LeagueController.selectPlayer({
-                        playerId,
-                        accountTournamentResultsId
-                    });
-                });
-
-                cb({'message': 'Successfully Selected Players'});
+                cb(res.rows[0]);
+            } else {
+                cb(null, err);
             }
         });
+    }
+
+    static selectPlayers(params, cb) {
+        if (!params.accountTournamentResultsId) {
+            // create account_tournament_results for account_player_tournament to reference
+            const sql = `
+                INSERT INTO account_tournament_results
+                    (league_tournament_id, league_account_id)
+                VALUES
+                    ($1, $2)
+                RETURNING *
+            `;
+
+            const values = [
+                params.leagueTournamentId,
+                params.leagueAccountId
+            ];
+
+            db.query(sql, values, (err, res) => {
+                console.log(err, res);
+                if (res) {
+                    let accountTournamentResultsId = res.rows[0].id;
+
+                    params.playerIds.forEach(playerId => {
+                        LeagueController.selectPlayer({
+                            playerId,
+                            accountTournamentResultsId
+                        });
+                    });
+
+                    cb({'message': 'Successfully Selected Players'});
+                }
+            });
+        } else {
+            console.log(params.accountTournamentResultsId);
+            params.playerIds.forEach(playerId => {
+                LeagueController.selectPlayer({
+                    playerId,
+                    accountTournamentResultsId: params.accountTournamentResultsId.id
+                });
+            });
+
+            cb({'message': 'Successfully Selected Players'});
+        }
     }
 
     static selectPlayer (params, cb) {
@@ -320,16 +365,16 @@ class LeagueController {
 
         db.query(sql, values, (err, res) => {
             if (!cb) {
-                console.log('account_player_tournament ' + res.rows[0].id);
-            } else {
-                if (!cb) {
-                    console.log(res, err);
+                if (err) {
+                    console.log(err);
                 } else {
-                    if (res && res.rows[0]) {
-                        cb(res.rows[0]);
-                    } else {
-                        cb(null, err);
-                    }
+                    console.log('account_player_tournament ' + res.rows[0].id);
+                }
+            } else {
+                if (res && res.rows[0]) {
+                    cb(res.rows[0]);
+                } else {
+                    cb(null, err);
                 }
             }
         });
@@ -454,6 +499,7 @@ class LeagueController {
 
 
     }
+
 }
 
 module.exports = LeagueController;

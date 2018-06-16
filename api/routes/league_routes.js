@@ -92,7 +92,7 @@ routes.post('/league/:id/initialize/:year', (req, res) => {
 });
 
 // params: tournamentId, playerIds
-routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeagueAccountId, (req, res) => {
+routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeagueAccountInfo, utils.getAccountTournamentResultsId, (req, res) => {
     let finalCb = (message, err) => {
         if (err) {
             res.status(500).json(err);
@@ -102,16 +102,16 @@ routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeague
     };
 
     let leagueTournamentCb = (leagueTournament, err) => {
-
         if (err) {
             res.status(500).json(err);
         } else {
+            let user = req.app.get('user');
             let params = {
-                leagueAccountId: req.app.get('user').leagueAccountId,
+                leagueAccountId: user.leagueAccountId,
                 leagueTournamentId: leagueTournament.id,
-                playerIds: req.body.playerIds
+                playerIds: req.body.playerIds,
+                accountTournamentResultsId: user.accountTournamentResultsId
             }
-
             LeagueController.selectPlayers(params, finalCb);
         }
     };
@@ -124,7 +124,7 @@ routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeague
     LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });
 
-routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountId, (req, res) => {
+routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountInfo, utils.getAccountTournamentResultsId, (req, res) => {
     let leagueTournamentCb = (leagueTournament, err) => {
         if (err) {
             res.status(500).json(err);
