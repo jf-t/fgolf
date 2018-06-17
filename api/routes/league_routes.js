@@ -4,6 +4,27 @@ const LeagueController = require('../controllers/league_controller');
 const utils = require('../utils/auth.js');
 
 
+routes.post('/league', utils.isAuthenticated, (req, res) => {
+    let cb = (league, err) => {
+        if (err) {
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(league.responseBody);
+        }
+    };
+
+    let user = req.app.get('user');
+
+    let params = {
+        'name': req.body.name,
+        'commishId': user.id,
+        'private': req.body.private || false,
+        'pw_hash': req.body.pw_hash || null
+    };
+
+    LeagueController.createLeague(params, cb);
+});
+
 
 routes.get('/leagues', utils.isAuthenticated, (req, res) => {
     let user = req.app.get('user');
@@ -33,28 +54,6 @@ routes.get('/league/:id', utils.isAuthenticated, (req, res) => {
 });
 
 
-routes.post('/league', utils.isAuthenticated, (req, res) => {
-    let cb = (league, err) => {
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(league.responseBody);
-        }
-    };
-
-    let user = req.app.get('user');
-
-    let params = {
-        'name': req.body.name,
-        'commishId': user.id,
-        'private': req.body.private || false,
-        'pw_hash': req.body.pw_hash || null
-    };
-
-    LeagueController.createLeague(params, cb);
-});
-
-
 routes.post('/league/:id/signup', utils.isAuthenticated, (req, res) => {
     let cb = (league_account, err) => {
         if (err) {
@@ -73,7 +72,7 @@ routes.post('/league/:id/signup', utils.isAuthenticated, (req, res) => {
     LeagueController.enrollUserInLeague(params, cb);
 });
 
-routes.post('/league/:id/initialize/:year', (req, res) => {
+routes.post('/league/:id/initialize/:year', utils.isAuthenticated, (req, res) => {
     let cb = (tournaments, err) => {
         if (err) {
             console.log(err);

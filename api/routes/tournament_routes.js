@@ -4,20 +4,6 @@ const TournamentController = require('../controllers/tournament_controller');
 const utils = require('../utils/auth.js');
 
 
-
-routes.get('/tournament/:id', utils.isAuthenticated, (req, res) => {
-    let cb = (tournament, err) => {
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(tournament);
-        }
-    }
-
-    TournamentController.getTournament(req.params.id, cb);
-});
-
-
 routes.post('/tournament', utils.isAuthenticated, (req, res) => {
     let cb = (tournament, err) => {
         if (err) {
@@ -44,6 +30,20 @@ routes.post('/tournament', utils.isAuthenticated, (req, res) => {
     };
 
     TournamentController.createTournament(params, cb);
+});
+
+
+
+routes.get('/tournament/:id', utils.isAuthenticated, (req, res) => {
+    let cb = (tournament, err) => {
+        if (err) {
+            res.status(500).json(err);
+        } else {
+            res.status(200).json(tournament);
+        }
+    }
+
+    TournamentController.getTournament(req.params.id, cb);
 });
 
 routes.post('/tournament/:id/initiate', utils.isAuthenticated, (req, res) => {
