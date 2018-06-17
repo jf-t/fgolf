@@ -83,7 +83,6 @@ class LeagueController {
                     leagueId: league.id,
                     accountId: params.commishId
                 }, (res) => {
-                    console.log(res);
                     cb(leagues);
                 });
             } else {
@@ -315,7 +314,6 @@ class LeagueController {
             ];
 
             db.query(sql, values, (err, res) => {
-                console.log(err, res);
                 if (res) {
                     let accountTournamentResultsId = res.rows[0].id;
 
