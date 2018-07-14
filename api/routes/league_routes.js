@@ -174,7 +174,8 @@ routes.get('/league/:id/leaderboard', utils.isAuthenticated, (req, res) => {
     let params = {
         leagueId: req.params.id,
         tournamentId: req.query.tid
-    }
+    };
+
     LeagueController.getLeaderboard(params, cb);
 });
 
