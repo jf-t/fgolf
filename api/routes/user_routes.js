@@ -56,7 +56,7 @@ routes.post('/auth', (req, res) => {
             res.status(500).json(err);
         } else {
             if (user.sessionToken) {
-                res.status(200).json(user);
+                res.status(200).json(user.responseBody);
             } else {
                 // Create session token
                 const currentTime = new Date();
