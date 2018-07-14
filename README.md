@@ -97,3 +97,9 @@
         array[player_tournament]
     Explanation:
         this is live tournament leaderboard from most recently scraped statdata
+
+### POST `/tournament/:season/create`
+    Response:
+        nothing really (yet)
+    Explanation:
+        scrapes statdata to get every tournament in the season, and puts the basic info into our DB
