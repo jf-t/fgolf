@@ -91,7 +91,7 @@ routes.get('/tournament/:id/leaderboard', utils.isAuthenticated, (req, res) => {
     TournamentController.getTournamentLeaderboard(req.params.id, cb);
 });
 
-routes.post('/tournament/:season/create', utils.isAuthenticated, (req, res) => {
+routes.post('/tournament/:season/create', (req, res) => {
     TournamentController.initiateSeason(req.params.season);
 });
 
