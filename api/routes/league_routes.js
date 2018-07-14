@@ -4,6 +4,11 @@ const LeagueController = require('../controllers/league_controller');
 const utils = require('../utils/auth.js');
 
 
+// TODO:
+//  - search leagues by name
+//  - edit selections (before thursday)
+
+
 routes.post('/league', utils.isAuthenticated, (req, res) => {
     let cb = (league, err) => {
         if (err) {
@@ -42,6 +47,8 @@ routes.get('/leagues', utils.isAuthenticated, (req, res) => {
 
 
 routes.get('/league/:id', utils.isAuthenticated, (req, res) => {
+    // this request needs to return enough information to fill out entire league section..
+    //  this week standings, overall money list,
     let cb = (league, err) => {
         if (err) {
             res.status(500).json(err);

@@ -3,6 +3,12 @@ const routes = require('express').Router();
 const TournamentController = require('../controllers/tournament_controller');
 const utils = require('../utils/auth.js');
 
+// TODO:
+//  - /initiate also needs to update most recent scores. (/update)
+//  - create full season schedule endpoint ***
+
+
+
 
 routes.post('/tournament', utils.isAuthenticated, (req, res) => {
     let cb = (tournament, err) => {
@@ -83,6 +89,10 @@ routes.get('/tournament/:id/leaderboard', utils.isAuthenticated, (req, res) => {
     }
 
     TournamentController.getTournamentLeaderboard(req.params.id, cb);
+});
+
+routes.post('/tournament/:season/create', utils.isAuthenticated, (req, res) => {
+    TournamentController.initiateSeason(req.params.season);
 });
 
 

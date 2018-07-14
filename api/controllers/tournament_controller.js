@@ -8,6 +8,8 @@ const Player = require('../models/player');
 const PlayerController = require('./player_controller');
 
 
+// I should think about saving courses someday
+
 class TournamentController {
 
     static getTournament (tournamentId, cb) {
@@ -76,12 +78,66 @@ class TournamentController {
         ];
 
         db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                cb(new Tournament(res.rows[0]));
+            if (!cb) {
+                console.log(res, err);
             } else {
-                cb(null, err || {'error': 'Some error with creating '})
+                if (res && res.rows[0]) {
+                    cb(new Tournament(res.rows[0]));
+                } else {
+                    cb(null, err || {'error': 'Some error with creating '})
+                }
             }
         });
+    }
+
+    static initiateSeason (year, cb) {
+        // We have to create a loop starting at 001 until 999 (i guess) to get every tournament
+        //  and the information around that tournament (name, start, end, course) and then put them all in DB
+
+        // After we need to be able to initiate a full season of events into league_tournament when someone creates league season
+
+
+        for (let i = 0; i < 999; i++) {
+            let strI = i.toString();
+            if (i < 10) {
+                strI = '00' + i;
+            } else if (i < 100) {
+                strI = '0' + i;
+            }
+            console.log(strI);
+
+            https.get(`https://statdata.pgatour.com/r/${strI}/leaderboard-v2mini.json`, (response) => {
+                if (response.statusCode !== 404) {
+                    let data = '';
+
+                    response.on('data', (chunk) => {
+                        data += chunk;
+                    });
+
+                    response.on('end', () => {
+                        let tournament = JSON.parse(data).leaderboard;
+
+                        let tournamentObj = {
+                            name: tournament.tournament_name,
+                            startingDate: tournament.start_date,
+                            season: year || 2018,
+                            endingDate: tournament.end_date,
+                            tid: tournament.tournament_id
+                        };
+
+                        let cb = (res, err) => {
+                            console.log(res, err);
+                        }
+
+                        TournamentController.createTournament(tournamentObj, cb);
+                    });
+                } else {
+                    console.log(response);
+                }
+            }).on('error', (e) => {
+                // dont really need to do shit, its supposed to be called when 404 is hit
+            });
+        }
     }
 
     static initiateTournamentPlayers (tournamentId, cb) {
