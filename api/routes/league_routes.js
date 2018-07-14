@@ -29,7 +29,7 @@ routes.post('/league', utils.isAuthenticated, (req, res) => {
 routes.get('/leagues', utils.isAuthenticated, (req, res) => {
     let user = req.app.get('user');
 
-    let cb = (league, err) => {
+    let cb = (leagues, err) => {
         if (err) {
             res.status(500).json(err);
         } else {
