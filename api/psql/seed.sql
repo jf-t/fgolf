@@ -136,18 +136,7 @@ INSERT INTO settings
     (league_id)
 VALUES
     (1);
-
-
-INSERT INTO tournament
-    (tid, name, season, starting_date, ending_date)
-VALUES
-    ('014', 'The Masters', 2018, '2018-04-05', '2018-04-08');
-
-INSERT INTO league_tournament
-    (league_id, tournament_id)
-VALUES
-    (1, '014');
-
+    
 
 INSERT INTO account_tournament_results
     (league_account_id, league_tournament_id)
