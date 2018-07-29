@@ -1,17 +1,17 @@
 import { connect } from 'react-redux';
-import LoginComponent from './component';
+import SignupComponent from './component';
 
-import { login } from './actions';
+import { signup } from '../../actions/user_actions';
 
 const mapStateToProps = state => ({
     user: state.currentUser
 });
 
 const mapDispatchToProps = dispatch => ({
-    login: (user) => dispatch(login(user))
+    signup: (user) => dispatch(signup(user))
 });
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(LoginComponent);
+)(SignupComponent);
