@@ -1,15 +1,25 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom'
+import lodash from 'lodash';
+
 
 export default class LoginComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            loggedIn: false
         };
 
         this.login = this.login.bind(this);
         this.update = this.update.bind(this);
+    }
+
+    componentDidUpdate () {
+        if (!lodash.isEmpty(this.props.user)) {
+            this.setState({ 'loggedIn': true });
+        }
     }
 
     login (evt) {
@@ -25,6 +35,10 @@ export default class LoginComponent extends React.Component {
     }
 
     render () {
+        if (this.state.loggedIn) {
+            return (<Redirect to='/' />);
+        }
+
         return (
             <div className="login main">
                 <form onSubmit={this.login}>

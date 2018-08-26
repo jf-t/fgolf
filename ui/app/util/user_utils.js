@@ -5,17 +5,22 @@ export const apiLogin = (user, success, error) => {
         method: 'POST',
         hostname: 'localhost',
         port: '3000',
-        path: '/auth'
+        path: '/auth',
+        headers: {
+            'Content-Type': 'application/json'
+        }
     }
 
+    let response = '';
     const req = http.request(options, (res) => {
         res.setEncoding('utf8');
 
         res.on('data', (chunk) => {
-            console.log(`BODY: ${chunk}`);
+            response += chunk;
         });
         res.on('end', () => {
-            console.log('No more data in response.');
+            console.log(response);
+            success(JSON.parse(response));
         });
     });
 
@@ -23,7 +28,7 @@ export const apiLogin = (user, success, error) => {
         console.error(`problem with request: ${e.message}`);
     });
 
-    req.write(user);
+    req.write(JSON.stringify(user));
     req.end();
 };
 

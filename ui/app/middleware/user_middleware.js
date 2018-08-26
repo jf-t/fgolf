@@ -1,10 +1,10 @@
 import { login, signup, receiveUser } from '../actions/user_actions';
 import { apiLogin, apiSignup} from '../util/user_utils';
-
+import { setCookie } from '../util/session';
 
 const UserMiddleware = ({getState, dispatch}) => next => action => {
     const success = (user) => {
-        localStorage.setItem('user', user);
+        setCookie('user', user);
         dispatch(receiveUser(user));
     };
 
