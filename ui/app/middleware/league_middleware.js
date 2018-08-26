@@ -3,13 +3,13 @@ import { apiGetLeagues} from '../util/league_utils';
 import { currentUser } from '../util/session';
 
 const LeagueMiddleware = ({getState, dispatch}) => next => action => {
-  const success = (user) => {
-    dispatch(receiveLeagues(user));
-  };
+    const success = (user) => {
+        dispatch(receiveLeagues(user));
+    };
 
-  const errors = (error) => {
-      dispatch(receiveLeagues([{'msg': 'error'}]));
-  }
+    const errors = (error) => {
+        dispatch(receiveLeagues([{'msg': 'error'}]));
+    }
 
     switch (action.type) {
         case 'GET_LEAGUES':

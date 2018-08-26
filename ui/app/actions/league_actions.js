@@ -3,6 +3,6 @@ export const getLeagues = () => ({
 });
 
 export const receiveLeagues = leagues => ({
-    type: 'RECEIVE_LEAGES',
+    type: 'RECEIVE_LEAGUES',
     leagues
 });
