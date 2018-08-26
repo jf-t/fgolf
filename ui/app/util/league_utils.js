@@ -7,18 +7,20 @@ export const apiGetLeagues = (currentUser, success, error) => {
         port: '3000',
         path: '/leagues',
         headers: {
-            sessionToken: currentUser.sessionToken
+            'Access-Control-Request-Headers': 'sessionToken',
+            'sessionToken': currentUser.sessionToken
         }
     };
 
+    let response = "";
     const req = http.request(options, (res) => {
         res.setEncoding('utf8');
 
         res.on('data', (chunk) => {
-            console.log(`BODY: ${chunk}`);
+            response += chunk;
         });
         res.on('end', () => {
-            success(JSON.parse(data));
+            success(JSON.parse(response));
         });
     });
 

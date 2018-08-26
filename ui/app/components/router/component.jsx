@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 import LoginContainer from '../login/container';
 import LeaguesContainer from '../league_list/container';
-import { isLoggedIn } from '../../util/session';
+import { currentUser } from '../../util/session';
 
 export default class AppRouter extends React.Component {
     render () {
@@ -10,7 +10,7 @@ export default class AppRouter extends React.Component {
             <BrowserRouter>
                 <div>
                     <Route path="/" render={() => (
-                            isLoggedIn() ? (
+                            (currentUser() !== null) ? (
                                 <LeaguesContainer />
                             ) : (
                                 <Redirect to="/login/" />

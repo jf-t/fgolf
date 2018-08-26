@@ -7,6 +7,6 @@ export const setCookie = (key, val) => {
     localStorage.setItem([key], JSON.stringify(val));
 };
 
-export const isLoggedIn = () => {
-    return (!!getCookie('user'));
-};
+export const currentUser = () => {
+    return (getCookie('user'));
+}

@@ -1,6 +1,6 @@
 import { getLeagues, receiveLeagues } from '../actions/league_actions';
 import { apiGetLeagues} from '../util/league_utils';
-
+import { currentUser } from '../util/session';
 
 const LeagueMiddleware = ({getState, dispatch}) => next => action => {
   const success = (user) => {
@@ -13,8 +13,7 @@ const LeagueMiddleware = ({getState, dispatch}) => next => action => {
 
     switch (action.type) {
         case 'GET_LEAGUES':
-            const currentUser = localStorage.getItem('user');
-            apiGetLeagues(currentUser, success, errors);
+            apiGetLeagues(currentUser(), success, errors);
             return next(action);
         default:
             return next(action);
