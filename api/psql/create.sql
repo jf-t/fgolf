@@ -75,6 +75,7 @@ CREATE TABLE league_tournament (
 );
 
 -- account_tournament_results links this user, league, and tournament for reference to selecting players
+-- user team of players in specific tournament
 CREATE TABLE account_tournament_results (
   id serial PRIMARY KEY,
   league_tournament_id integer REFERENCES league_tournament(id) NOT NULL,
@@ -83,6 +84,8 @@ CREATE TABLE account_tournament_results (
 );
 
 -- account_player_tournament links a tournament, user, player, and league into 1
+-- when a league_account selects a player for a tournament
+-- each league_account will have settings/num_slots number of account_player_tournament
 CREATE TABLE account_player_tournament (
     id serial PRIMARY KEY,
     account_tournament_results_id integer REFERENCES account_tournament_results(id) NOT NULL,

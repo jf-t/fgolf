@@ -4,11 +4,11 @@ import LeagueDetailComponent from './component';
 import { getLeague } from '../../actions/league_actions';
 
 const mapStateToProps = state => ({
-    league: state.league
+    standings: state.league.standings
 });
 
 const mapDispatchToProps = dispatch => ({
-    getLeague: (id) => dispatch(getLeague(id))
+    // Maybe some way of filtering leaderboard?
 });
 
 export default connect(

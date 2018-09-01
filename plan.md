@@ -36,17 +36,17 @@ best project structure for me
         * signup: type 'SIGNUP', user
 ## league-list
     - 'component.jsx'
-        * display list of leagues in div
+        * display list of leagues in ul
         * on click events to /league/:id
         * props: leagues (array of league objects)
     - 'container.js'
-        * state: leagues [array[object]]
-        * dispatch: getLeagues() (inside componentOnMount - for now, i am not sure if this is the best way long term but since i can't find any good opposing arguments right now, i am going to accept this as using the naive solution)
+        * dispatch: getLeagues() (inside componentOnMount - for now, i am not sure if this is the best method long term but since i can't find any good counterarguments, i am going to accept this as using the naive solution)
     - 'actions.js'
         * getLeagues: type: 'GET_LEAGUES' (this action does not need any params because API uses sessionToken to get current user and gets leagues according to that)
 ## league
     - 'component.jsx'
         * display <Standings> and <Managers> (for now)
+        * props: league (league object with manager standings, live leaderboard, upcoming events(?))
     - 'container.js'
         * state: league [object] (this for now is just basic info)
         * dispatch: getLeague(leagueId)
