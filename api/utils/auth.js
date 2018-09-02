@@ -20,7 +20,6 @@ const isAuthenticated = (req, res, next) => {
 
         UserController.checkSession(sessionToken, cb);
     }
-
 };
 
 const getLeagueAccountInfo = (req, res, next) => {

@@ -3,6 +3,9 @@ const User = require('../models/user');
 const db = require('../db');
 
 
+// TODO:
+//  - sign out user
+
 class UserController {
     static login (params, cb) {
         let sql = `

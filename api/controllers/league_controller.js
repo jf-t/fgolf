@@ -3,6 +3,26 @@ const League = require('../models/league');
 const db = require('../db');
 const TournamentController = require('./tournament_controller');
 
+// NOTE: In this controller:
+//  - getUserLeagues
+//  - getLeague
+//  - createLeague
+//  - initiateSettings
+//  - updateLeague
+//  - getLeagueAccountId
+//  - enrollUserInLeague
+//  - createSeason
+//  - getLeagueTournament
+//  - createLeagueTournament
+//  - getAccountTournamentResultsId
+//  - selectPlayers
+//  - selectPlayer
+//  - getAccountTournamentResults
+//  - getLeaderboard
+
+// TODO:
+//  - TBD
+
 class LeagueController {
     static getUserLeagues(userId, cb) {
         const sql = `

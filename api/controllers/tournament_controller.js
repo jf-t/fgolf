@@ -10,6 +10,18 @@ const PlayerController = require('./player_controller');
 
 // I should think about saving courses someday
 
+// NOTE: In this controller:
+//  - getTournament
+//  - getSeasonByYear
+//  - createTournament
+//  - initiateSeason
+//  - initiateTournamentPlayers
+//  - createTournamentPlayers
+//  - updateTournamentScores
+//  - getTournamentLeaderboard
+//  - createLeagueTournamentLeaderboard
+//  - getCurrentTournament
+
 class TournamentController {
 
     static getTournament (tournamentId, cb) {
@@ -117,6 +129,8 @@ class TournamentController {
                     response.on('end', () => {
                         let tournament = JSON.parse(data).leaderboard;
 
+                        TournamentController.createTournamentPlayers(strI, tournament.players);
+
                         console.log(tournament.start_date);
                         let tournamentObj = {
                             name: tournament.tournament_name,
@@ -127,6 +141,8 @@ class TournamentController {
                         };
 
                         let cb = (res, err) => {
+                            console.log('success');
+
                             console.log(res, err);
                         }
 
@@ -153,74 +169,16 @@ class TournamentController {
             response.on('end', () => {
                 let players = JSON.parse(data).leaderboard.players;
 
-                let index = 0;
-                let insertedPlayers = [];
-                players.forEach((playerObj) => {
-                    let playerId = playerObj.player_id;
-
-                    let playerCreateCb = (player, err) => {
-                        if (player) {
-                            insertedPlayers.push(player);
-                            index += 1;
-                            if (index === players.length) {
-                                cb(insertedPlayers);
-                            }
-
-                            PlayerController.createPlayerTournament({playerId, tournamentId});
-                        } else {
-                            if (err) {
-                                console.log(err);
-                                cb(null, err);
-                            } else {
-                                const params = {
-                                    playerId,
-                                    name: playerObj.player_bio.first_name + ' ' + playerObj.player_bio.last_name
-                                };
-
-                                PlayerController.createPlayer(params, playerCreateCb);
-                            }
-                        }
-                    }
-
-
-                    PlayerController.getPlayer(playerId, playerCreateCb);
-                });
+                TournamentController.createTournamentPlayers(tournamentId, players, cb);
             });
         });
     }
 
-    static createTournamentPlayers(players) {
+    static createTournamentPlayers(tid, players, cb) {
         let index = 0;
         let insertedPlayers = [];
         players.forEach((playerObj) => {
-            let playerId = playerObj.player_id;
-
-            let playerCreateCb = (player, err) => {
-                if (player) {
-                    insertedPlayers.push(player);
-                    index += 1;
-                    if (index === players.length) {
-                        cb(insertedPlayers);
-                    }
-
-                    PlayerController.createPlayerTournament({playerId, tournamentId});
-                } else {
-                    if (err) {
-                        console.log(err);
-                        cb(null, err);
-                    } else {
-                        const params = {
-                            playerId,
-                            name: playerObj.player_bio.first_name + ' ' + playerObj.player_bio.last_name
-                        };
-
-                        PlayerController.createPlayer(params, playerCreateCb);
-                    }
-                }
-            }
-
-
-            PlayerController.getPlayer(playerId, playerCreateCb);
+            PlayerController.initiatePlayerTournament(playerObj);
         });
     }
 
