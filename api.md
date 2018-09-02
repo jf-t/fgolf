@@ -8,16 +8,22 @@ If any middleware has errors, the response of 500 will be immediately returned w
 
 I also need a method of scraping the statdata website more efficiently. i feel like they will block me at some point for obviously scraping the pages in succession.
 
+Another idea is to split logic more into object based... Component would contain controller functions and model logic as well. this way all of the logic would be tied together more.
+
+These component public functions would be called as middleware on the route, which would just respond with a simple callback of returning response. components will be used more as what they represent in compared to exactly what the function is doing.
+
+If i can plan out all of the functions that I need, i can create a more stable API
+
 Here is a list of every possible middleware function grouped together. They all exist inside the controllers:
 
 ### User Middleware:
-- create user
-- get user by session
-- get user by id
-- log in user
-- sign out user
-- update user by field
-- delete user
+- create user - UserController.createUser
+- get user by session - UserController.checkSession
+- get user by id - UserController.getUser
+- log in user - UserController.login
+- sign out user - INCOMPLETE
+- update user by field - INCOMPLETE
+- delete user - INCOMPLETE
 
 ### League Middleware
 - create league - LeagueController.createLeague
@@ -25,16 +31,17 @@ Here is a list of every possible middleware function grouped together. They all 
 - get leagues by user (basic league info) - LeagueController.getUserLeagues
 - update league - LeagueController.updateLeague
 - get league current standings -
-- get league money list
+- get league money list - INCOMPLETE
 
 ### Tournament Middleware
-- create tournament
-- get tournament by id
-- scrape live tournament
-- update leaderboard
-- create player tournament
-- update player tournament
-- get player tournament (by pga_id and tid)
+- create tournament - TournamentController.createTournament
+- get tournament by id - TournamentController.getTournament
+- scrape live tournament -
+- update leaderboard -
+- create season - TournamentController.initiateSeason
+- create player tournament -
+- update player tournament -
+- get player tournament (by pga_id and tid) -
 
 
 ### Pl@yer Middleware

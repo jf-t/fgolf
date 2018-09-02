@@ -178,8 +178,40 @@ class TournamentController {
         let index = 0;
         let insertedPlayers = [];
         players.forEach((playerObj) => {
-            PlayerController.initiatePlayerTournament(playerObj);
-        });
+            let playerId = playerObj.player_id;
+
+            let playerCreateCb = (player, err) => {
+                console.log(player);
+                if (player) {
+                    insertedPlayers.push(player);
+                    index += 1;
+                    if (index === players.length) {
+                        if (cb) {
+                            cb(insertedPlayers);
+                        } else {
+                            console.log("inserted players", insertedPlayers);
+                        }
+                    }
+
+                    PlayerController.createPlayerTournament({playerId, tid});
+                } else {
+                    if (err) {
+                        console.log(err);
+                        if (cb) { cb(null, err); }
+                    } else {
+                        const params = {
+                            playerId,
+                            name: playerObj.player_bio.first_name + ' ' + playerObj.player_bio.last_name
+                        };
+
+                        PlayerController.createPlayer(params, playerCreateCb);
+                    }
+                }
+            }
+
+
+            PlayerController.getPlayer(playerId, playerCreateCb);
+         });
     }
 
     static updateTournamentScores (tournamentId, cb) {

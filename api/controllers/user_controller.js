@@ -3,11 +3,22 @@ const User = require('../models/user');
 const db = require('../db');
 
 
+// NOTE: In this controller
+//  - login
+//  - createUser
+//  - getUser
+//  - updateSession
+//  - checkSession
+
 // TODO:
 //  - sign out user
 
 class UserController {
     static login (params, cb) {
+        // TODO:
+        // - Login needs to call UserController.updateSession to create
+        //    new sessionToken when user is logged in. It is currently
+        //    being done inside the user route.
         let sql = `
             SELECT
                 *
@@ -37,6 +48,8 @@ class UserController {
 
 
      static createUser (params, cb) {
+         // TODO:
+         // - If there is validations on the route, it should be moved to here.
         let sql = `
             INSERT INTO accounts
                 (username, pw_hash, email, session_token)
