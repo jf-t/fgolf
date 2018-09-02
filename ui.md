@@ -45,8 +45,8 @@ best project structure for me
         * getLeagues: type: 'GET_LEAGUES' (this action does not need any params because API uses sessionToken to get current user and gets leagues according to that)
 ## league
     - 'component.jsx'
-        * display <Standings> and <Managers> (for now)
-        * props: league (league object with manager standings, live leaderboard, upcoming events(?))
+        * display <Standings> <Leaderboard> <Season> (for now)
+        * props: league (league object with manager standings, live leaderboard, upcoming events(?), season money list)
     - 'container.js'
         * state: league [object] (this for now is just basic info)
         * dispatch: getLeague(leagueId)
@@ -61,7 +61,7 @@ best project structure for me
         * state: leaderboard [array[object]]
         * dispatch getPlayers(accountTournamentResults) (get the results of this account's current tournament score)
     - 'actions.js'
-        * getLeaderboard: type: 'GET_LEADERBOARD', leagueId (this might be just received through getLeague)
+        * getStandings: type: 'GET_STANDINGS', leagueId
 ### managers
     - 'component.jsx'
         * displays table of managers
@@ -72,6 +72,39 @@ best project structure for me
         * dispatch: getManagers(leagueId) (gets manager username and email and earnings(?))
     - 'actions.js'
         * getManagers: type: 'GET_MANAGERS', leagueId (this might be just received through getLeague)
+### tournament
+    - 'component.jsx'
+        * display information about current tournament:
+            - tournament information
+            - course information (in the future)
+            - leaderboard/field(if in future
+        * signed in user's players/link to pick players (/select)
+    - 'container.js'
+        * state: tournament info [object{objects}]
+        * dispatch: getLeagueTournament(leagueTournamentId) (cant decide between leagueTournamentId or using leagueId and tourmamentId - maybe both)
+    - 'actions.js'
+        * getLeagueTournament: type: 'GET_LEAGUE_TOURNAMENT', leagueTournamentId
+### select_players
+    - 'component.jsx'
+        * display list of players in order of OWGR (somehow)
+        * player name will have link to show modal about player information
+            - player name, fed-ex rank, OWGR, scoring average
+            - bio, education, past tours
+            - recent events
+            - statistics
+        * button on modal and in table "SELECT"
+        * show list of selected players in right column
+        * when list of 12 players is selected, green Submit button is activated below
+        * future edition should have search players
+    - 'container.js'
+        * state: players [object]
+        * dispatch:
+            - selectPlayer(leagueAccountId, playerId)
+            - getPlayerInformation(playerId)
+    - 'actions.js'
+        * selectPlayer: type 'SELECT_PLAYER', leagueAccountId, playerId
+        * getPlayerInformation: type 'GET_PLAYER_INFORMATION', playerId
+
 
 
 ## These remaining components will be thought more about later:        

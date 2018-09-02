@@ -1,5 +1,6 @@
 const UserController = require('../controllers/user_controller');
 const LeagueController = require('../controllers/league_controller');
+const TournamentController = require('../controllers/tournament_controller');
 
 const isAuthenticated = (req, res, next) => {
     let sessionToken = req.get('sessionToken');
@@ -26,6 +27,7 @@ const getLeagueAccountInfo = (req, res, next) => {
     let user = req.app.get('user');
 
 
+
     let accountId = user.id;
     let leagueId = req.params.id;
 
@@ -48,7 +50,8 @@ const getLeagueAccountInfo = (req, res, next) => {
 };
 
 const getAccountTournamentResultsId = (req, res, next) => {
-    if (req.query.tournamentId || req.body.tournamentId) {
+    console.log(req.tid);
+    if (req.tid || req.body.tournamentId) {
         let cb = (accountTournamentResultsId , err) => {
             if (err) {
                 res.status(500).json({ 'error': err });
@@ -63,8 +66,8 @@ const getAccountTournamentResultsId = (req, res, next) => {
 
         let leagueAccountId = req.app.get('user').leagueAccountId;
 
-        let tournamentId = req.query.tournamentId ?
-                           req.query.tournamentId :
+        let tournamentId = req.tid ?
+                           req.tid :
                            req.body.tournamentId;
 
 
@@ -74,8 +77,27 @@ const getAccountTournamentResultsId = (req, res, next) => {
     }
 };
 
+const currentTournamentId = (req, res, next) => {
+    if (req.query.tid) {
+        req.tid = req.query.tid;
+        next();
+    } else {
+        let cb = (tournament, err) => {
+            if (err || (!tournament)) {
+                res.status(500).json({'error': err || 'Tournament is null'});
+            } else {
+                req.tid = tournament.tid;
+                next();
+            }
+        }
+
+        TournamentController.getCurrentTournament(cb);
+    }
+};
+
 module.exports = {
     isAuthenticated: isAuthenticated,
     getLeagueAccountInfo: getLeagueAccountInfo,
-    getAccountTournamentResultsId: getAccountTournamentResultsId
+    getAccountTournamentResultsId: getAccountTournamentResultsId,
+    currentTournamentId: currentTournamentId
 };

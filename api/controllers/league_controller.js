@@ -38,6 +38,12 @@ class LeagueController {
     }
 
     static getLeague (leagueId, cb) {
+        // TODO:
+        //  - get standings
+        //  - get this, next week tournaments
+        //  - get money list
+        //  - get leaderboard
+
         const sql = `
             SELECT
                 *
@@ -288,6 +294,7 @@ class LeagueController {
             params.leagueAccountId
         ];
 
+
         db.query(sql, values, (err, res) => {
             if (res) {
                 cb(res.rows[0]);
@@ -410,7 +417,9 @@ class LeagueController {
             params.leagueAccountId
         ];
 
+
         db.query(sql, values, (err, res) => {
+            console.log(res.rows);
             if (res) {
                 cb(res.rows);
             } else {
@@ -431,7 +440,6 @@ class LeagueController {
                 accounts.username
             FROM
                 league
-
             JOIN
                 league_tournament
             ON
@@ -440,7 +448,7 @@ class LeagueController {
             JOIN
                 league_account
             ON
-                league_account.id = league.id
+                league_account.league_id = league.id
 
             JOIN
                 accounts
@@ -453,7 +461,7 @@ class LeagueController {
         `;
 
         const values = [
-            params.leagueId,
+            parseInt(params.leagueId),
             params.tournamentId
         ];
 
@@ -475,6 +483,7 @@ class LeagueController {
                                 }
                             });
 
+                            console.log(results, score);
                             cb({ players: results, score });
                         }
                     }
@@ -483,6 +492,7 @@ class LeagueController {
                         leagueTournamentId: user.league_tournament_id,
                         leagueAccountId: user.league_account_id
                     };
+
 
                     LeagueController.getAccountTournamentResults(params, completeCb);
                 });

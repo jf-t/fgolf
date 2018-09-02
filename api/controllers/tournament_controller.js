@@ -117,6 +117,7 @@ class TournamentController {
                     response.on('end', () => {
                         let tournament = JSON.parse(data).leaderboard;
 
+                        console.log(tournament.start_date);
                         let tournamentObj = {
                             name: tournament.tournament_name,
                             startingDate: tournament.start_date,
@@ -185,6 +186,41 @@ class TournamentController {
                     PlayerController.getPlayer(playerId, playerCreateCb);
                 });
             });
+        });
+    }
+
+    static createTournamentPlayers(players) {
+        let index = 0;
+        let insertedPlayers = [];
+        players.forEach((playerObj) => {
+            let playerId = playerObj.player_id;
+
+            let playerCreateCb = (player, err) => {
+                if (player) {
+                    insertedPlayers.push(player);
+                    index += 1;
+                    if (index === players.length) {
+                        cb(insertedPlayers);
+                    }
+
+                    PlayerController.createPlayerTournament({playerId, tournamentId});
+                } else {
+                    if (err) {
+                        console.log(err);
+                        cb(null, err);
+                    } else {
+                        const params = {
+                            playerId,
+                            name: playerObj.player_bio.first_name + ' ' + playerObj.player_bio.last_name
+                        };
+
+                        PlayerController.createPlayer(params, playerCreateCb);
+                    }
+                }
+            }
+
+
+            PlayerController.getPlayer(playerId, playerCreateCb);
         });
     }
 
@@ -307,6 +343,34 @@ class TournamentController {
         db.query(sql, values, (err, res) => {
             if (res && res.rows[0]) {
                 cb(res.rows);
+            }
+        });
+    }
+
+    static getCurrentTournament (cb) {
+        const sql = `
+            SELECT
+                *
+            FROM
+                tournament
+        `;
+        // The issue with this method is the starting_date in DB starts thursday currently
+        //  so monday-wednesday there is no current event
+        // This should be fixed when tournaments are being created, should start monday
+        db.query(sql, [], (err, res) => {
+            if (res && res.rows[0]) {
+                for (let tournament of res.rows) {
+                    let startingDate = new Date (tournament.starting_date),
+                        endingDate = new Date (tournament.ending_date),
+                        currentDate = new Date();
+
+                    if ((startingDate < currentDate) && (endingDate > currentDate)) {
+                        cb(tournament);
+                        break;
+                    }
+                };
+            } else {
+                cb(null, err);
             }
         });
     }

@@ -48,7 +48,7 @@ routes.get('/leagues', utils.isAuthenticated, (req, res) => {
 
 routes.get('/league/:id', utils.isAuthenticated, (req, res) => {
     // this request needs to return enough information to fill out entire league section..
-    //  this week standings, overall money list,
+    //  this week standings, overall money list, leaderboard
     let cb = (league, err) => {
         if (err) {
             res.status(500).json(err);
@@ -130,7 +130,7 @@ routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeague
     LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });
 
-routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountInfo, utils.getAccountTournamentResultsId, (req, res) => {
+routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountInfo, utils.currentTournamentId, (req, res) => {
     let leagueTournamentCb = (leagueTournament, err) => {
         if (err) {
             res.status(500).json(err);
@@ -152,16 +152,18 @@ routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountI
         }
     };
 
+
     let leagueTournamentParams = {
-        tournamentId: req.query.tid,
+        tournamentId: req.tid,
         leagueId: parseInt(req.params.id)
     };
+
 
     LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });
 
 
-routes.get('/league/:id/leaderboard', utils.isAuthenticated, (req, res) => {
+routes.get('/league/:id/leaderboard', utils.isAuthenticated, utils.currentTournamentId, (req, res) => {
     let cb = (leaderboard, err) => {
         if (err) {
             console.log(err);
@@ -171,9 +173,10 @@ routes.get('/league/:id/leaderboard', utils.isAuthenticated, (req, res) => {
         }
     };
 
+
     let params = {
         leagueId: req.params.id,
-        tournamentId: req.query.tid
+        tournamentId: req.tid // get current tournament id has to exist
     };
 
     LeagueController.getLeaderboard(params, cb);
