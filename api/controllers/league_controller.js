@@ -18,7 +18,7 @@ const TournamentController = require('./tournament_controller');
 //  - selectPlayers
 //  - selectPlayer
 //  - getAccountTournamentResults
-//  - getLeaderboard
+//  - getStandings
 
 // TODO:
 //  - TBD
@@ -452,7 +452,7 @@ class LeagueController {
         });
     }
 
-    static getLeaderboard (params, cb) {
+    static getStandings (params, cb) {
         const sql = `
             SELECT
                 league_tournament.id as league_tournament_id,

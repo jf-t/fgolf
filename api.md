@@ -59,6 +59,8 @@ Here is a list of every possible middleware function grouped together. They all 
         email (string)
     Response:
         user.responseBody
+    Middleware:
+        user.create
 
 ### POST `/auth`
     Body:
@@ -66,10 +68,14 @@ Here is a list of every possible middleware function grouped together. They all 
         password (string)
     Response
         user.responseBody
+    Middleware:
+        user.login
 
 ### GET `/user/:id`
     Response:
         user.responseBody
+    Middleware:
+        user.getById
 
 
 ## League_routes
@@ -80,12 +86,18 @@ Here is a list of every possible middleware function grouped together. They all 
         password (string)
     Response:
         league.responseBody
+    Middleware:
+        user.isLoggedIn
+        league.create
 
 ### GET `/leagues`
     Response:
         array[league.responseBody]
     Explanation:
         Gets leagues of specific signed in user to be displayed on home screen
+    Middleware:
+        user.isLoggedIn
+        league.getUserLeagues
 
 ### NEED UPDATE - GET `/league/:id`
     Response:
@@ -105,7 +117,7 @@ Here is a list of every possible middleware function grouped together. They all 
             - tournament name
         - next week
             - tournament id
-            tournament name
+            - tournament name
         - money list []
             - user id
             - username
@@ -119,37 +131,71 @@ Here is a list of every possible middleware function grouped together. They all 
             - r2
             - r3
             - r4
+    Middleware:
+        user.isLoggedIn
+        league.getById
+        tournament.currentEvent
+        tournament.scrape
+        league.getStandings
+        league.moneyList
+        tournament.updateLeaderboard
 ### POST `/league/:id/signup`
     Body:
         accountId (int)
     Response:
         league_account
+    Middleware:
+        user.isLoggedIn
+        league.getById
+        league.enroll
 ### POST `/league/:id/initialize/:year`
     Response:
         array[league_tournament]
     Explanation:
         Gets every tournament in DB with year param and create league_tournament for each
+    Middleware:
+        user.isLoggedIn
+        league.getById
+        tournament.getSeason
+        league.createSeason
+
 ### POST `/league/:id/select_players`
     Body:
         playerIds, (array[int])
         tournamentId (int)
     Response:
         Message saying successful
+    Middleware:
+        user.isLoggedIn
+        league.getById
+        tournament.currentEvent
+        player.getByIds
+        league.selectPlayers
+
+
+
 ### GET `/league/:id/players`
     Query:
         tid (string of length 3)
     Response:
         array[player]
-    Explanation:
+    Note:
+        I am not sure what this function does
 
-### GET `/league/:id/leaderboard`
+### GET `/league/:id/standings`
     Query:
         tid (string of length 3)
     Response:
         array[league_account with results]
+    Middleware:
+        user.isLoggedIn
+        league.getById
+        league.getStandings
 
 ## Tournament_routes
 ### POST '/tournament'
+    Note:
+        Frontend will not need this endpoint
     Body:
         tid, (string of length 3)
         name, (string)
@@ -157,27 +203,100 @@ Here is a list of every possible middleware function grouped together. They all 
         endingDate (ISO)
     Response:
         tournament
+    Middleware:
+        tournament.create
 ### GET `/tournament/:id`
     Response:
         tournament
+        will need more information
+    Middleware:
+        user.isLoggedIn
+        tournament.getById
 ### POST `/tournament/:id/initiate`
     Response:
         array[player_tournament without scores]
     Explanation:
         This scrapes statdata.pgatour.com to get player names, checks if they exist in DB, if not create new player
-### POST `/tournament/:id/update`
+    Middleware:
+        tournamanent.getById
+        tournament.scrape
+        tournament.initiatePlayers
+        tournament.updateLeaderboard
+
+### PUT `/tournament/:id/leaderboard`
+    Note:
+        this is going to be the most used endpoint in production because it will be called whenever a user needs to see the leaderboard
+
+        should never be called before all of the players are initiated
     Response:
         message saying successful
     Explanation:
         This scrapes statdata again and gets scores this time. I think these two need to be on the same endpoint, it is dumb to scrape same shit twice
-### GET `/tournament/:id/leaderboard`
-    Response:
-        array[player_tournament]
-    Explanation:
-        this is live tournament leaderboard from most recently scraped statdata
+    Middleware:
+        user.isLoggedIn
+        tournament.scrape
+        tournament.updateLeaderboard
+
 
 ### POST `/tournament/:season/create`
-    Response:
-        nothing really (yet)
-    Explanation:
-        scrapes statdata to get every tournament in the season, and puts the basic info into our DB
+    *NOTE*:
+        should never be used unless necessary!!!!!
+
+
+
+# API Components:
+User:
+    model:
+        id,
+        username,
+        email,
+        pw_hash,
+        session_token
+    middleware functions:
+        create
+        login
+        getById
+        isLoggedIn
+        delete
+League:
+    model:
+        id,
+        name,
+        commish_id,
+        private,
+        pw_hash
+
+        standings
+    middleware functions:
+        create
+        getUserLeagues
+        getById
+        enroll
+        createSeason
+        selectPlayers
+
+Tournament:
+    model:
+        tid,
+        name,
+        season,
+        starting_date,
+        ending_date
+    middleware functions:
+        create
+        getById
+        currentEvent
+        scrape
+        getSeason
+        initiatePlayers
+        updateLeaderboard
+Player
+    model:
+        pga_id,
+        name
+
+        tournament_score
+    middleware_functions:
+        create
+        getByIds
+        getById

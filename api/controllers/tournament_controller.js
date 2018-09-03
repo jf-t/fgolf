@@ -103,6 +103,8 @@ class TournamentController {
     }
 
     static initiateSeason (year, cb) {
+        // NOTE: Don't call this unless we have to
+
         // We have to create a loop starting at 001 until 999 (i guess) to get every tournament
         //  and the information around that tournament (name, start, end, course) and then put them all in DB
 

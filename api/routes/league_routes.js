@@ -163,7 +163,7 @@ routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountI
 });
 
 
-routes.get('/league/:id/leaderboard', utils.isAuthenticated, utils.currentTournamentId, (req, res) => {
+routes.get('/league/:id/standings', utils.isAuthenticated, utils.currentTournamentId, (req, res) => {
     let cb = (leaderboard, err) => {
         if (err) {
             console.log(err);
@@ -179,7 +179,7 @@ routes.get('/league/:id/leaderboard', utils.isAuthenticated, utils.currentTourna
         tournamentId: req.tid // get current tournament id has to exist
     };
 
-    LeagueController.getLeaderboard(params, cb);
+    LeagueController.getStandings(params, cb);
 });
 
 
