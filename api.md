@@ -30,7 +30,8 @@ Here is a list of every possible middleware function grouped together. They all 
 - get league by id - LeagueController.getLeague
 - get leagues by user (basic league info) - LeagueController.getUserLeagues
 - update league - LeagueController.updateLeague
-- get league current standings -
+- sign user up for league - LeagueController.enrollUserInLeague
+- get league current standings - LeagueController.getStandings
 - get league money list - INCOMPLETE
 
 ### Tournament Middleware

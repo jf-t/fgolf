@@ -21,7 +21,7 @@ const TournamentController = require('./tournament_controller');
 //  - getStandings
 
 // TODO:
-//  - TBD
+//  - getMoneyList
 
 class LeagueController {
     static getUserLeagues(userId, cb) {
@@ -84,7 +84,7 @@ class LeagueController {
         });
     }
 
-    static createLeague (params, cb) {
+    static post (req, res, next) {
         const sql = `
             INSERT INTO league
                 (name, commish_id, private, pw_hash)
@@ -94,42 +94,75 @@ class LeagueController {
                 *
         `;
 
+
+        let user = req.user;
+
         const values = [
-            params.name,
-            params.commishId,
-            params.private,
-            params.pw_hash
+            req.body.name,
+            user.id,
+            req.body.private || false,
+            req.body.pw_hash || null
         ];
 
         db.query(sql, values, (err, res) => {
             if (res && res.rows[0]) {
                 let league = new League(res.rows[0])
 
-                this.enrollUserInLeague({
-                    leagueId: league.id,
-                    accountId: params.commishId
-                }, (res) => {
-                    cb(leagues);
-                });
+                req.league = league;
+                req.userId = user.id;
+
+                next();
             } else {
-                cb(null, err);
+                res.status(500).json(err);
             }
         });
     }
 
-    static initiateSettings(league) {
+    static initiateSettings(req, res, next) {
         const sql = `
             INSERT INTO settings
                 (league_id)
             VALUES
                 ($1)
+            RETURNING *
         `;
 
-        const values = [league.id];
+        const values = [req.league.id];
 
         db.query(sql, values, (err, res) => {
-            if (res) {
-                console.log("Settings Initiated on League " + league.id);
+            if (res && res.rows[0]) {
+                req.league.settings = res.rows[0];
+                next();
+            } else {
+                res.status(500).json({'error': err, 'msg': 'I dont know why this would happen'});
+            }
+        });
+    }
+
+
+    static enrollUser (req, res, next) {
+        // Validate that account_id, league_id are unique
+
+        const sql = `
+            INSERT INTO league_account
+                (account_id, league_id)
+            VALUES
+                ($1, $2)
+            RETURNING
+                *
+        `;
+
+        const values = [
+            req.userId,
+            req.league.id
+        ];
+
+        db.query(sql, values, (err, res) => {
+            if (res && res.rows[0]) {
+                req.league.addUser(res.rows[0]);
+                next();
+            } else {
+                cb(null, err);
             }
         });
     }
@@ -189,32 +222,6 @@ class LeagueController {
         });
     }
 
-
-    static enrollUserInLeague(params, cb) {
-        // Validate that account_id, league_id are unique
-
-        const sql = `
-            INSERT INTO league_account
-                (account_id, league_id)
-            VALUES
-                ($1, $2)
-            RETURNING
-                *
-        `;
-
-        const values = [
-            params.accountId,
-            params.leagueId
-        ];
-
-        db.query(sql, values, (err, res) => {
-            if (res && res.body[0]) {
-                cb({'message': 'Successfully enrolled'})
-            } else {
-                cb(null, err);
-            }
-        });
-    }
 
     static createSeason (params, cb) {
         let contCb = (tournaments, err) => {

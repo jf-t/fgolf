@@ -14,6 +14,7 @@ const db = require('../db');
 //  - sign out user
 
 class UserController {
+    // getUserCreds sets a request variable for req.userCreds so the signup/signin logic can be seperated
     static getUserCreds (req, res, next) {
         const secret = 'abcdefg';
         const pw_hash = crypto.createHmac('sha256', secret)

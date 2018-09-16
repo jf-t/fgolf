@@ -1,6 +1,8 @@
 const routes = require('express').Router();
 
-const LeagueController = require('../controllers/league_controller');
+const user = require('../controllers/user_controller');
+const league = require('../controllers/league_controller');
+
 const utils = require('../utils/auth.js');
 
 
@@ -9,29 +11,17 @@ const utils = require('../utils/auth.js');
 //  - edit selections (before thursday)
 
 
-routes.post('/league', utils.isAuthenticated, (req, res) => {
-    let cb = (league, err) => {
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(league.responseBody);
-        }
-    };
-
-    let user = req.app.get('user');
-
-    let params = {
-        'name': req.body.name,
-        'commishId': user.id,
-        'private': req.body.private || false,
-        'pw_hash': req.body.pw_hash || null
-    };
-
-    LeagueController.createLeague(params, cb);
+// Create League
+routes.post('/league', user.checkSession, league.post, league.initiateSettings, league.enrollUser, (req, res) => {
+    if (req.league) {
+        res.status(200).json(req.league.responseBody);
+    } else {
+        res.status(500).json({'error': 'Unregistered issue post /league'});
+    }
 });
 
-
-routes.get('/leagues', utils.isAuthenticated, (req, res) => {
+// Get User Leagues
+routes.get('/leagues', utils.isAuthenticated, league.getLeague, (req, res) => {
     let user = req.app.get('user');
 
     let cb = (leagues, err) => {
@@ -46,6 +36,7 @@ routes.get('/leagues', utils.isAuthenticated, (req, res) => {
 });
 
 
+// Get League by ID
 routes.get('/league/:id', utils.isAuthenticated, (req, res) => {
     // this request needs to return enough information to fill out entire league section..
     //  this week standings, overall money list, leaderboard
@@ -61,6 +52,7 @@ routes.get('/league/:id', utils.isAuthenticated, (req, res) => {
 });
 
 
+// Sign up user for league
 routes.post('/league/:id/signup', utils.isAuthenticated, (req, res) => {
     let cb = (league_account, err) => {
         if (err) {
@@ -79,6 +71,7 @@ routes.post('/league/:id/signup', utils.isAuthenticated, (req, res) => {
     LeagueController.enrollUserInLeague(params, cb);
 });
 
+// Initialize year of tournaments
 routes.post('/league/:id/initialize/:year', utils.isAuthenticated, (req, res) => {
     let cb = (tournaments, err) => {
         if (err) {
@@ -97,6 +90,7 @@ routes.post('/league/:id/initialize/:year', utils.isAuthenticated, (req, res) =>
     LeagueController.createSeason(params, cb);
 });
 
+// Select players for league tournament account
 // params: tournamentId, playerIds
 routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeagueAccountInfo, utils.getAccountTournamentResultsId, (req, res) => {
     let finalCb = (message, err) => {
@@ -130,6 +124,7 @@ routes.post('/league/:id/select_players', utils.isAuthenticated, utils.getLeague
     LeagueController.getLeagueTournament(leagueTournamentParams, leagueTournamentCb);
 });
 
+// Get league players
 routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountInfo, utils.currentTournamentId, (req, res) => {
     let leagueTournamentCb = (leagueTournament, err) => {
         if (err) {
@@ -163,6 +158,7 @@ routes.get('/league/:id/players', utils.isAuthenticated, utils.getLeagueAccountI
 });
 
 
+// Get league standings
 routes.get('/league/:id/standings', utils.isAuthenticated, utils.currentTournamentId, (req, res) => {
     let cb = (leaderboard, err) => {
         if (err) {
