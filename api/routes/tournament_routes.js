@@ -1,7 +1,7 @@
 const routes = require('express').Router();
 
-const TournamentController = require('../controllers/tournament_controller');
-const utils = require('../utils/auth.js');
+const tournament = require('../controllers/tournament_controller');
+const user = require('../controllers/user_controller');
 
 // TODO:
 //  - /initiate also needs to update most recent scores. (/update)
@@ -10,7 +10,7 @@ const utils = require('../utils/auth.js');
 
 
 
-routes.post('/tournament', utils.isAuthenticated, (req, res) => {
+routes.post('/tournament', user.userFromSession, (req, res) => {
     let cb = (tournament, err) => {
         if (err) {
             console.log(err);
@@ -40,7 +40,7 @@ routes.post('/tournament', utils.isAuthenticated, (req, res) => {
 
 
 
-routes.get('/tournament/:id', utils.isAuthenticated, (req, res) => {
+routes.get('/tournament/:id', user.userFromSession, (req, res) => {
     let cb = (tournament, err) => {
         if (err) {
             res.status(500).json(err);
@@ -52,7 +52,7 @@ routes.get('/tournament/:id', utils.isAuthenticated, (req, res) => {
     TournamentController.getTournament(req.params.id, cb);
 });
 
-routes.post('/tournament/:id/initiate', utils.isAuthenticated, (req, res) => {
+routes.post('/tournament/:id/initiate', user.userFromSession, (req, res) => {
     // use statdata.pgatour to scrape and update tournament scores
     let cb = (message, err) => {
         if (err) {
@@ -65,7 +65,7 @@ routes.post('/tournament/:id/initiate', utils.isAuthenticated, (req, res) => {
 });
 
 
-routes.post('/tournament/:id/update', utils.isAuthenticated, (req, res) => {
+routes.post('/tournament/:id/update', user.userFromSession, (req, res) => {
     // use statdata.pgatour to scrape and update tournament scores
     let cb = (message, err) => {
         if (err) {
@@ -79,7 +79,7 @@ routes.post('/tournament/:id/update', utils.isAuthenticated, (req, res) => {
 
 
 
-routes.get('/tournament/:id/leaderboard', utils.isAuthenticated, (req, res) => {
+routes.get('/tournament/:id/leaderboard', user.userFromSession, (req, res) => {
     let cb = (leaderboard, err) => {
         if (err) {
             res.status(500).json(err);

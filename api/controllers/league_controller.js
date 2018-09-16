@@ -24,7 +24,7 @@ const TournamentController = require('./tournament_controller');
 //  - getMoneyList
 
 class LeagueController {
-    static getUserLeagues(userId, cb) {
+    static userLeagues(req, res, next) {
         const sql = `
             SELECT
                 league.*
@@ -39,7 +39,7 @@ class LeagueController {
         `;
 
         const values = [
-            userId
+            req.user.id
         ];
 
         db.query(sql, values, (err, res) => {
@@ -50,9 +50,10 @@ class LeagueController {
                     return league.responseBody;
                 });
 
-                cb(leagues);
+                req.leagues = leagues;
+                next();
             } else {
-                cb(null, err || {'error': 'No Leagues for logged in User'});
+                res.status(500).json(err || {'error': 'No Leagues for logged in User'});
             }
         });
     }

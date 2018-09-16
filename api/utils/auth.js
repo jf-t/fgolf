@@ -2,26 +2,6 @@ const UserController = require('../controllers/user_controller');
 const LeagueController = require('../controllers/league_controller');
 const TournamentController = require('../controllers/tournament_controller');
 
-const isAuthenticated = (req, res, next) => {
-    let sessionToken = req.get('sessionToken');
-
-    if (!sessionToken) {
-        res.status(500).json({'error': 'Not Authenticated! - Send Token Header'});
-    } else {
-        let cb = (user, err) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({'error': 'Not Authenticated! - No user with that token'});
-            } else {
-                req.app.set('user', user);
-                next();
-            }
-        }
-
-        UserController.checkSession(sessionToken, cb);
-    }
-};
-
 const getLeagueAccountInfo = (req, res, next) => {
     let user = req.app.get('user');
 
@@ -95,7 +75,6 @@ const currentTournamentId = (req, res, next) => {
 };
 
 module.exports = {
-    isAuthenticated: isAuthenticated,
     getLeagueAccountInfo: getLeagueAccountInfo,
     getAccountTournamentResultsId: getAccountTournamentResultsId,
     currentTournamentId: currentTournamentId

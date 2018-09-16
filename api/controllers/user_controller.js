@@ -8,7 +8,7 @@ const db = require('../db');
 //  - createUser
 //  - getUser
 //  - updateSession
-//  - checkSession
+//  - userFromSession
 
 // TODO:
 //  - sign out user
@@ -137,7 +137,7 @@ class UserController {
         });
     }
 
-    static checkSession(req, res, next) {
+    static userFromSession(req, res, next) {
         let sql = `
             SELECT
                 *

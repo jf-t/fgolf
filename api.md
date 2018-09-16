@@ -18,7 +18,7 @@ Here is a list of every possible middleware function grouped together. They all 
 
 ### User Middleware:
 - create user - UserController.createUser
-- get user by session - UserController.checkSession
+- get user by session - UserController.userFromSession
 - get user by id - UserController.getUser
 - log in user - UserController.login
 - sign out user - INCOMPLETE
