@@ -5,6 +5,8 @@ class League {
         this.commishId = params.commish_id;
         this.pwHash = params.pw_hash;
         this.private = params.private || false;
+
+        this.settings = params.settings ? params.settings : {};
     }
 
     get responseBody () {
@@ -12,7 +14,8 @@ class League {
             id: this.id,
             name: this.name,
             commishId: this.commishId,
-            private: this.private
+            private: this.private,
+            settings: this.settings
         }
     }
 
