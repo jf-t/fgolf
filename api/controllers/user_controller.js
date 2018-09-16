@@ -125,7 +125,7 @@ class UserController {
                 accounts.id = $1
         `;
 
-        let values = [req.params.id];
+        let values = [req.params.id || req.body.userId];
 
         db.query(sql, values, (err, res) => {
             if (res && res.rows[0]) {

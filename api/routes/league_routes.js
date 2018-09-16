@@ -21,6 +21,7 @@ routes.post('/league', user.userFromSession, league.post, league.initiateSetting
 });
 
 // Get User Leagues
+// need to get more information about league: users, standings, leaderboard
 routes.get('/leagues', user.userFromSession, league.userLeagues, (req, res) => {
     if (req.leagues) {
         res.status(200).json(req.leagues);
@@ -31,42 +32,26 @@ routes.get('/leagues', user.userFromSession, league.userLeagues, (req, res) => {
 
 
 // Get League by ID
-routes.get('/league/:id', user.userFromSession, (req, res) => {
-    // this request needs to return enough information to fill out entire league section..
-    //  this week standings, overall money list, leaderboard
-    let cb = (league, err) => {
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(league.responseBody);
-        }
-    };
-
-    LeagueController.getLeague(req.params.id, cb);
+routes.get('/league/:leagueId', user.userFromSession, league.get, (req, res) => {
+    if (req.league) {
+        res.status(200).json(req.league);
+    } else {
+        res.status(500).json({'error': 'Unregistered issue get /league'});
+    }
 });
 
 
 // Sign up user for league
-routes.post('/league/:id/signup', user.userFromSession, (req, res) => {
-    let cb = (league_account, err) => {
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(league_account);
-        }
-    };
-
-    const params = {
-        accountId: req.body.accountId,
-        leagueId: req.params.id
-    };
-
-
-    LeagueController.enrollUserInLeague(params, cb);
+routes.post('/league/:leagueId/signup', user.userFromSession, league.get, user.getById, league.enrollUser, (req, res) => {
+    if (req.league) {
+        res.status(200).json(req.league);
+    } else {
+        res.status(500).json({'error': 'Unregistered issue post /league/:leagueId/signup'});
+    }
 });
 
 // Initialize year of tournaments
-routes.post('/league/:id/initialize/:year', user.userFromSession, (req, res) => {
+routes.post('/league/:leagueId/initialize/:year', user.userFromSession, league.get, (req, res) => {
     let cb = (tournaments, err) => {
         if (err) {
             console.log(err);
@@ -86,7 +71,7 @@ routes.post('/league/:id/initialize/:year', user.userFromSession, (req, res) => 
 
 // Select players for league tournament account
 // params: tournamentId, playerIds
-routes.post('/league/:id/select_players', user.userFromSession, utils.getLeagueAccountInfo, utils.getAccountTournamentResultsId, (req, res) => {
+routes.post('/league/:leagueId/select_players', user.userFromSession, utils.getLeagueAccountInfo, utils.getAccountTournamentResultsId, (req, res) => {
     let finalCb = (message, err) => {
         if (err) {
             res.status(500).json(err);
@@ -119,7 +104,7 @@ routes.post('/league/:id/select_players', user.userFromSession, utils.getLeagueA
 });
 
 // Get league players
-routes.get('/league/:id/players', user.userFromSession, utils.getLeagueAccountInfo, utils.currentTournamentId, (req, res) => {
+routes.get('/league/:leagueId/players', user.userFromSession, utils.getLeagueAccountInfo, utils.currentTournamentId, (req, res) => {
     let leagueTournamentCb = (leagueTournament, err) => {
         if (err) {
             res.status(500).json(err);
@@ -153,7 +138,7 @@ routes.get('/league/:id/players', user.userFromSession, utils.getLeagueAccountIn
 
 
 // Get league standings
-routes.get('/league/:id/standings', user.userFromSession, utils.currentTournamentId, (req, res) => {
+routes.get('/league/:leagueId/standings', user.userFromSession, utils.currentTournamentId, (req, res) => {
     let cb = (leaderboard, err) => {
         if (err) {
             console.log(err);

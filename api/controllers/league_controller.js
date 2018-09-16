@@ -42,9 +42,9 @@ class LeagueController {
             req.user.id
         ];
 
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                let leagues = res.rows.map((leagueObj) => {
+        db.query(sql, values, (err, response) => {
+            if (response && response.rows[0]) {
+                let leagues = response.rows.map((leagueObj) => {
                     let league = new League(leagueObj);
 
                     return league.responseBody;
@@ -58,7 +58,7 @@ class LeagueController {
         });
     }
 
-    static getLeague (leagueId, cb) {
+    static get (req, res, next) {
         // TODO:
         //  - get standings
         //  - get this, next week tournaments
@@ -74,13 +74,14 @@ class LeagueController {
                 id = $1
         `;
 
-        const values = [leagueId];
+        const values = [req.params.leagueId];
 
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                cb(new League(res.rows[0]));
+        db.query(sql, values, (err, response) => {
+            if (response && response.rows[0]) {
+                req.league = new League(response.rows[0]);
+                next();
             } else {
-                cb(null, err || {'error': 'No League with that ID'});
+                res.status(500).json(err || {'error': 'No League with that ID'});
             }
         });
     }
@@ -105,9 +106,9 @@ class LeagueController {
             req.body.pw_hash || null
         ];
 
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                let league = new League(res.rows[0])
+        db.query(sql, values, (err, response) => {
+            if (response && response.rows[0]) {
+                let league = new League(response.rows[0])
 
                 req.league = league;
                 req.userId = user.id;
@@ -130,9 +131,9 @@ class LeagueController {
 
         const values = [req.league.id];
 
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                req.league.settings = res.rows[0];
+        db.query(sql, values, (err, response) => {
+            if (response && response.rows[0]) {
+                req.league.settings = response.rows[0];
                 next();
             } else {
                 res.status(500).json({'error': err, 'msg': 'I dont know why this would happen'});
@@ -154,16 +155,16 @@ class LeagueController {
         `;
 
         const values = [
-            req.userId,
+            req.userId || req.user.id,
             req.league.id
         ];
 
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                req.league.addUser(res.rows[0]);
+        db.query(sql, values, (err, response) => {
+            if (response && response.rows[0]) {
+                req.league.addUser(response.rows[0]);
                 next();
             } else {
-                cb(null, err);
+                res.status(500).json(err || {"error": "Error in Enrolling user"});
             }
         });
     }
@@ -189,9 +190,9 @@ class LeagueController {
             params.leagueId
         ];
 
-        db.query(sql, values, (err, res) => {
-            if (res && res.rows[0]) {
-                cb(new League(res.rows[0]));
+        db.query(sql, values, (err, response) => {
+            if (response && response.rows[0]) {
+                cb(new League(response.rows[0]));
             } else {
                 cb(null, err || {'error': 'No League with that ID'})
             }
@@ -214,9 +215,9 @@ class LeagueController {
             params.accountId
         ];
 
-        db.query(sql, values, (err, res) => {
-            if (res) {
-                cb(res.rows[0].id);
+        db.query(sql, values, (err, response) => {
+            if (response) {
+                cb(response.rows[0].id);
             } else {
                 cb(null, err);
             }
@@ -261,10 +262,10 @@ class LeagueController {
             params.tournamentId
         ];
 
-        db.query(sql, values, (err, res) => {
+        db.query(sql, values, (err, response) => {
 
-            if (res && res.rows[0]) {
-                cb(res.rows[0]);
+            if (response && response.rows[0]) {
+                cb(response.rows[0]);
             } else {
                 cb(null, err);
             }
@@ -286,12 +287,12 @@ class LeagueController {
             params.tournamentId
         ];
 
-        db.query(sql, values, (err, res) => {
-            if (res) {
+        db.query(sql, values, (err, response) => {
+        if (response) {
                 if (!cb) {
-                    console.log({'message': 'Created League Tournament ' + res.rows[0].tournament_id});
+                    console.log({'message': 'Created League Tournament ' + response.rows[0].tournament_id});
                 } else {
-                    cb(res.rows[0]);
+                    cb(response.rows[0]);
                 }
             } else {
                 console.error(err);
@@ -323,9 +324,9 @@ class LeagueController {
         ];
 
 
-        db.query(sql, values, (err, res) => {
-            if (res) {
-                cb(res.rows[0]);
+        db.query(sql, values, (err, response) => {
+            if (response) {
+                cb(response.rows[0]);
             } else {
                 cb(null, err);
             }
@@ -348,9 +349,9 @@ class LeagueController {
                 params.leagueAccountId
             ];
 
-            db.query(sql, values, (err, res) => {
-                if (res) {
-                    let accountTournamentResultsId = res.rows[0].id;
+            db.query(sql, values, (err, response) => {
+                if (response) {
+                    let accountTournamentResultsId = response.rows[0].id;
 
                     params.playerIds.forEach(playerId => {
                         LeagueController.selectPlayer({
@@ -396,16 +397,16 @@ class LeagueController {
             params.playerId
         ];
 
-        db.query(sql, values, (err, res) => {
+        db.query(sql, values, (err, response) => {
             if (!cb) {
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log('account_player_tournament ' + res.rows[0].id);
+                    console.log('account_player_tournament ' + response.rows[0].id);
                 }
             } else {
-                if (res && res.rows[0]) {
-                    cb(res.rows[0]);
+                if (response && response.rows[0]) {
+                    cb(response.rows[0]);
                 } else {
                     cb(null, err);
                 }
@@ -446,10 +447,10 @@ class LeagueController {
         ];
 
 
-        db.query(sql, values, (err, res) => {
-            console.log(res.rows);
-            if (res) {
-                cb(res.rows);
+        db.query(sql, values, (err, response) => {
+            console.log(response.rows);
+            if (response) {
+                cb(response.rows);
             } else {
                 console.log(err);
                 cb(null, err || {
@@ -493,14 +494,14 @@ class LeagueController {
             params.tournamentId
         ];
 
-        db.query(sql, values, (err, res) => {
-            if (res) {
-                res.rows.forEach(user => {
+        db.query(sql, values, (err, response) => {
+            if (response) {
+                response.rows.forEach(user => {
                     let results = [];
                     let completeCb = (tournamentResults) => {
                         results.push(tournamentResults);
 
-                        if (results.length === res.rows.length) {
+                        if (results.length === response.rows.length) {
                             let score = 0;
 
                             console.log(results[0]);
