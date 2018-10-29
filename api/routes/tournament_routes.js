@@ -10,46 +10,22 @@ const user = require('../controllers/user_controller');
 
 
 
-routes.post('/tournament', user.userFromSession, (req, res) => {
-    let cb = (tournament, err) => {
-        if (err) {
-            console.log(err);
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(tournament);
-        }
-    }
-
-    let season = null;
-    if (!req.body.year) {
-        season = parseInt(req.body.startingDate.split('-')[0]);
+routes.post('/tournament', user.userFromSession, tournament.post, tournament.scrape, tournament.initiateTournamentPlayers, tournament.updateTournamentScores, (req, res) => {
+    if (req.tournament) {
+        res.status(200).json(req.tournament.responseBody);
     } else {
-        season = req.body.year;
+        res.status(500).json({'error': 'Unregistered issue post /tournament'});
     }
-
-    const params = {
-        'tid': req.body.tid,
-        'name': req.body.name,
-        'season': season,
-        'startingDate': req.body.startingDate,
-        'endingDate': req.body.endingDate
-    };
-
-    TournamentController.createTournament(params, cb);
 });
 
 
 
-routes.get('/tournament/:id', user.userFromSession, (req, res) => {
-    let cb = (tournament, err) => {
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.status(200).json(tournament);
-        }
+routes.get('/tournament/:id', user.userFromSession, tournament.get, (req, res) => {
+    if (req.tournament) {
+        res.status(200).json(req.tournament.responseBody);
+    } else {
+        res.status(500).json({'error': 'Unregistered issue get /tournament'});
     }
-
-    TournamentController.getTournament(req.params.id, cb);
 });
 
 routes.post('/tournament/:id/initiate', user.userFromSession, (req, res) => {

@@ -24,7 +24,7 @@ const PlayerController = require('./player_controller');
 
 class TournamentController {
 
-    static getTournament (tournamentId, cb) {
+    static get (req, res, next) {
         const sql = `
             SELECT
                 *
@@ -34,13 +34,14 @@ class TournamentController {
                 tid = $1
         `;
 
-        const values = [tournamentId];
+        const values = [req.params.id];
 
         db.query(sql, values, (err, res) => {
             if (res && res.rows[0]) {
-                cb(new Tournament(res.rows[0]));
+                req.tournament = new Tournament(res.rows[0]);
+                next();
             } else {
-                cb(null, err || {'error': 'There is no tournament with that ID'});
+                res.status(500).json(err || {'error': 'There is no tournament with that ID'});
             }
         });
     }
@@ -72,7 +73,14 @@ class TournamentController {
     }
 
 
-    static createTournament (params, cb) {
+    static post (req, res, next) {
+        let season = null;
+        if (!req.body.year) {
+            season = parseInt(req.body.startingDate.split('-')[0]);
+        } else {
+            season = req.body.year;
+        }
+
         const sql = `
             INSERT INTO tournament
                 (tid, name, season, starting_date, ending_date)
@@ -82,22 +90,20 @@ class TournamentController {
         `;
 
         const values = [
-            params.tid,
-            params.name,
-            params.season,
-            params.startingDate,
-            params.endingDate
+            req.body.tid,
+            req.body.name,
+            req.body.season,
+            season,
+            req.body.endingDate
         ];
 
+
         db.query(sql, values, (err, res) => {
-            if (!cb) {
-                console.log(res, err);
+            if (res && res.rows[0]) {
+                req.tournament = new Tournament(res.rows[0]);
+                next();
             } else {
-                if (res && res.rows[0]) {
-                    cb(new Tournament(res.rows[0]));
-                } else {
-                    cb(null, err || {'error': 'Some error with creating '})
-                }
+                res.status(500).json(err || {'error': 'Some error with creating '});
             }
         });
     }
@@ -214,6 +220,24 @@ class TournamentController {
 
             PlayerController.getPlayer(playerId, playerCreateCb);
          });
+    }
+
+    static scrape (req, res, next) {
+        https.get('https://statdata.pgatour.com/r/' + tournamentId + '/leaderboard-v2mini.json', (response) => {
+            let data = '';
+
+            response.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            // The whole response has been received. Print out the result.
+            response.on('end', () => {
+                let tournament = JSON.parse(data).leaderboard;
+
+                req.tournament.setScrapedData(tournament);
+                next();
+            });
+        });
     }
 
     static updateTournamentScores (tournamentId, cb) {
